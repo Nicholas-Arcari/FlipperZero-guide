@@ -1,4 +1,4 @@
-# **• BadUSB**
+# BadUSB
 
 Sistema di automazione basato su script HID che permette al FlipperZero di comportarsi come una tastiera o mouse USB, eseguendo comandi su diversi sistemi operativi.
 
