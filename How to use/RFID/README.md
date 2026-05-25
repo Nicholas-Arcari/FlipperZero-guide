@@ -1,155 +1,45 @@
-# Flipper Zero – Modulo RFID (125 kHz)
+# RFID 125 kHz - Overview
 
-Il modulo RFID 125 kHz del Flipper Zero consente di leggere, emulare, analizzare, clonare e generare tag RFID a bassa frequenza, come EM4100, HID, FDX-B e T5577.
+Modulo di lettura, scrittura ed emulazione di tag RFID a **125 kHz** (Low Frequency). Copre i protocolli EM4100, HID Prox, Indala, FDX-B e supporta la scrittura su tag programmabili T5577.
 
-È utilizzato in sistemi di accesso, identificazione animale, controllo presenze e automazione.
-
-Questo README descrive:
-
-- Cos’è il modulo RFID
-- Le cartelle e i tool inclusi
-- Funzione di ogni componente
-- Esempi pratici su come, quando e dove usarlo
+**Frequenza:** 125 kHz (+ 134.2 kHz per FDX-B) | **Portata:** 3-8 cm | **Scrittura:** T5577 | **Protocolli:** 20+
 
 ---
 
-## Cos’è il modulo RFID 125 kHz
+## Contenuti
 
-Il Flipper Zero integra un’antenna e un lettore/scrittore per tag a bassa frequenza:
-
-- Lettura di tag EM4100, HID Prox, FDX-B e simili
-- Emulazione diretta per aprire porte o attivare sistemi
-- Scrittura su tag programmabili (T5577)
-- Analisi e fuzzing dei protocolli LF
-
-È ideale per reverse engineering, test di sicurezza e compatibilità.
-
----
-
-### RFID 125 kHz (cartella principale)
-
-Lettura, salvataggio, emulazione, scrittura e gestione tag LF.
-
-- Funzione: gestione principale dei badge 125 kHz.
-
-- Quando usarlo: porte d’accesso, sistemi di registrazione, cancelli.
-
-### DCF77 Clock Sync
-
-Sincronizzazione oraria tramite protocollo DCF77 (radio-orologio europeo).
-
-- Funzione: decodifica segnale orario standard.
-
-- Uso: ricerca, test, studio protocolli temporali.
-
-### DCF77 Transmitter
-
-Generatore di segnale DCF77 artificiale.
-
-- Funzione: emula un segnale orario radio.
-
-- Uso: test orologi radiocontrollati.
-
-### EM4100 Key Generator
-
-Generatore di tag EM4100.
-
-- Funzione: crea codici EM4100 validi per test.
-
-- Uso: ricerca e compatibilità.
-
-### FDX-B Maker
-
-Creazione di tag per sistemi animali ISO 11784/11785.
-
-- Funzione: genera ID compatibili con microchip animali.
-
-- Uso: ricerca, studio standard FDX-B.
-
-### NFC/RFID Detector
-
-Rilevatore di campi NFC e RFID.
-
-- Funzione: mostra se un lettore è attivo.
-
-- Uso: test di ambienti e sicurezza fisica.
-
-### RFID Fuzzer
-
-Strumento per fuzzing protocolli LF.
-
-- Funzione: invio frame non standard.
-
-- Uso: test robustezza sistemi RFID.
-
-### T5577 MultiWriter
-
-Scrittura semplificata per tag T5577.
-
-- Funzione: copia automatica da un tag letto.
-
-- Uso: duplicazione veloce.
-
-### T5577 Raw Writer
-
-Scrittura avanzata con comandi raw.
-
-- Funzione: scrittura settori specifici del T5577.
-
-- Uso: ricerca e configurazioni particolari.
+| # | File | Descrizione |
+|---|------|-------------|
+| 01 | [Fondamenti Tecnici](01-Fondamenti-Tecnici.md) | RFID LF, accoppiamento induttivo, modulazione ASK/FSK/PSK, struttura dei frame |
+| 02 | [Hardware e Limiti](02-Hardware-e-Limiti.md) | Antenna LF del Flipper, portata reale, limiti di emulazione/scrittura |
+| 03 | [Protocolli](03-Protocolli.md) | EM4100 (frame 64-bit completo), HID Prox H10301 (26-bit), Indala, FDX-B (ISO 11784/11785), T5577 (Block 0 config word, emulazione multi-protocollo) |
+| 04 | [Guida Operativa](04-Guida-Operativa.md) | Tool-by-tool: Read, Write, Emulate, Add Manually, EM4100 Key Generator, FDX-B Maker, RFID Fuzzer, T5577 MultiWriter, T5577 Raw Writer, DCF77, NFC/RFID Detector |
+| 05 | [Scenari Reali](05-Scenari-Reali.md) | 7 scenari dettagliati: condominio EM4100, badge HID aziendale, fuzzing lettore, rilevamento lettori nascosti, parcheggio multipiano, palestra/anti-passback, red team building |
+| 06 | [Attacchi e Difese](06-Attacchi-e-Difese.md) | Replay/clonazione, bruteforce, jamming, skimming a distanza, manipolazione database |
+| 07 | [Aspetti Legali](07-Aspetti-Legali.md) | Art. 615-ter/quater, 640-ter c.p., GDPR, procedure operative legali |
+| 08 | [Esperienza Personale](08-Esperienza-Personale.md) | Troubleshooting completo, limiti del Flipper, kit operativo, errori da evitare, futuro del 125 kHz, riferimenti |
 
 ---
 
-## Esempi pratici di utilizzo
+## Quick Reference - Protocolli Principali
 
-### 1. Clonare un badge 125 kHz su un T5577
+| Protocollo | Bit | Modulazione | Sicurezza | Diffusione Italia |
+|-----------|-----|------------|-----------|-------------------|
+| EM4100 | 64 (40 dati) | ASK/Manchester | Zero | Condomini, palestre, parcheggi |
+| HID H10301 | 26 | FSK2 | Zero | Uffici, banche, ospedali |
+| Indala | 26/29 | PSK1 | Zero | Raro (edifici NATO, USA) |
+| FDX-B | 128 | ASK/NRZ | Read-only | Microchip animali (obbligatorio) |
+| T5577 | Programmabile | Qualsiasi | Password opzionale | Target di scrittura universale |
 
-1. Vai su RFID 125 kHz → Read
-2. Avvicina il badge originale → salva il file
-3. Inserisci un tag T5577
-4. Apri T5577 MultiWriter → “Write from saved file”
-5. Testa l’emulazione o il tag fisico
+## Quick Reference - Workflow Operativo
 
-Quando usarlo: badge d’accesso danneggiati o test ricerca.
+```
+RFID → Read → Identifica protocollo
+  ├─ EM4100 → Clone su T5577 (5 secondi) → Test al lettore
+  ├─ HID H10301 → Annota FC:CN → Clone su T5577 → Fuzzing su CN
+  ├─ Indala → Clone su T5577 (meno affidabile) → Verifica
+  ├─ FDX-B → Solo lettura/emulazione (no write reale)
+  └─ Unknown → Proxmark3 per analisi raw
+```
 
-### 2. Generare un tag EM4100 personalizzato
-
-1. Apri EM4100 Key Generator
-2. Inserisci un ID o generane uno casuale
-3. Scrivi su T5577 → testalo nel lettore
-
-Dove usarlo: laboratori, test compatibilità.
-
-### 3. Analizzare un sistema sospetto con NFC/RFID Detector
-
-1. Avvia NFC/RFID Detector
-2. Passa vicino a porte, scrivanie, terminali
-3. Se rileva campo attivo, significa che è presente un lettore
-
-Utilità: mappatura sicurezza fisica.
-
-### 4. Trasmettere un segnale DCF77 artificiale
-
-1. Apri DCF77 Transmitter
-2. Scegli ora corrente o personalizzata
-3. Attiva la trasmissione vicino a un orologio radiocontrollato
-
-Uso: test protocolli orari.
-
-### 5. Fuzzing di un lettore RFID
-
-1. Apri RFID Fuzzer
-2. Seleziona tipo di frame
-3. Invia → osserva comportamento del lettore
-
-Obiettivo: scoprire errori di implementazione.
-
----
-
-## Dove si usa l’RFID 125 kHz
-
-- Sistemi d’accesso industriali
-- Condomini, uffici, hotel
-- Control board e macchinette
-- Sistemi legacy a bassa frequenza
-- Ricerca e pentesting hardware
+> **Nota personale:** Il 90% dei condomini italiani usa EM4100 senza crittografia. La clonazione richiede meno di 10 secondi. Un Flipper e 10 T5577 in tasca sono tutto cio' che serve per dimostrare che il sistema di accesso è un'illusione di sicurezza.
