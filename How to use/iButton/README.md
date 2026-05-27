@@ -1,110 +1,42 @@
-# iButton
+# iButton - Overview
 
-Strumenti e funzionalità dedicate alla lettura, emulazione, conversione e fuzzing dei iButton / Dallas Keys tramite Flipper Zero.
+Modulo per lettura, scrittura, emulazione e analisi di chiavi **iButton** (1-Wire contact keys). Supporta i protocolli Dallas/Maxim DS1990A, Cyfral e Metakom, con capacità di scrittura su chiavi riscrivibili RW1990.
 
-Il modulo iButton permette di:
-
-- leggere chiavi fisiche (es. DS1990A / iButton 1-Wire)
-- emulare una chiave iButton salvata
-- convertire formati non standard
-- testare e analizzare protocolli compatibili tramite fuzzer dedicati
+**Interfaccia:** 1-Wire (contatto) | **Protocolli:** DS1990A, Cyfral, Metakom | **Scrittura:** RW1990 | **ID:** 64 bit (8 byte)
 
 ---
 
-## • iButton
+## Contenuti
 
-Funzione principale dedicata alla lettura, salvataggio ed emulazione di chiavi iButton.
+| # | File | Descrizione |
+|---|------|-------------|
+| 01 | [Fondamenti Tecnici](01-Fondamenti-Tecnici.md) | Protocollo 1-Wire, elettrica del bus, timing, ROM commands, topologia |
+| 02 | [Hardware e Limiti](02-Hardware-e-Limiti.md) | Interfaccia iButton del Flipper, contatto GPIO, portata, limiti fisici |
+| 03 | [Protocolli](03-Protocolli.md) | DS1990A (64-bit ROM, family code), Cyfral (impulsi), Metakom, RW1990 programmabile |
+| 04 | [Guida Operativa](04-Guida-Operativa.md) | Tool-by-tool: Read, Write, Emulate, Add Manually, Converter, Fuzzer |
+| 05 | [Scenari Reali](05-Scenari-Reali.md) | Scenari pentest: condominio DS1990A, palazzo Cyfral/Metakom, building assessment, citofono industriale, casi città italiane |
+| 06 | [Attacchi e Difese](06-Attacchi-e-Difese.md) | Clonazione, bruteforce, fuzzing, bypass - attacchi e contromisure |
+| 07 | [Aspetti Legali](07-Aspetti-Legali.md) | Normativa italiana/EU per iButton testing |
+| 08 | [Esperienza Personale](08-Esperienza-Personale.md) | Troubleshooting, limiti Flipper, kit operativo, errori da evitare, riferimenti |
 
-Funzionalità ampliate:
+---
 
-- Lettura chiavi Dallas/Maxim DS1990A / RW1990 / TM1990 / Cyfral / Metakom.
-- Salvataggio in formato `.ibtn` con ID completo.
-- Emulazione diretta tramite contatto fisico.
-- Libreria interna per gestire più chiavi.
-- Possibilità di clonare chiavi compatibili (solo per uso lecito / personale).
+## Quick Reference - Protocolli
 
-Esempio pratico:
+| Protocollo | ID | Diffusione Italia | Sicurezza | Clonabile |
+|-----------|-----|-------------------|-----------|-----------|
+| DS1990A | 64 bit (8 byte) | Molto alta (condomini) | Zero | Si' (RW1990) |
+| Cyfral | Variabile | Media (vecchi citofoni) | Zero | Si' (emulazione) |
+| Metakom | Variabile | Media (vecchi citofoni) | Zero | Si' (emulazione) |
 
-Emulare una chiave DS1990A del tuo citofono:
+## Quick Reference - Workflow
 
-1. Apri iButton → Read.
-2. Tocca la chiave originale sul pad iButton del Flipper.
-3. Salva il dump.
-4. Vai su iButton → Emulate e seleziona la chiave.
-5. Tocca il lettore del citofono → funziona come la chiave originale.
+```
+iButton → Read (contatto con chiave) → Identifica protocollo
+  ├─ DS1990A → Clone su RW1990 (3 secondi) → Test al citofono
+  ├─ Cyfral → Emulazione (non scrivibile) → Test al citofono
+  ├─ Metakom → Emulazione (non scrivibile) → Test al citofono
+  └─ Non riconosciuto → Verifica contatto, riprova con angolazione diversa
+```
 
-Quando usarlo:
-
-- Accesso a cancelli, citofoni e sistemi basati su 1-Wire.
-- Backup di chiavi personali.
-- Test e verifica compatibilità con sistemi esistenti.
-
-Dove usarlo:
-
-- Sistemi condominiali.
-- Serrature con iButton.
-- Controller industriali che adottano chiavi Dallas.
-
-## • iButton Converter
-
-Strumento per convertire chiavi non standard o protocolli particolari in formati compatibili con la struttura del Flipper.
-
-Funzionalità ampliate:
-
-- Conversione tra formati Cyfral ↔ Dallas, Metakom ↔ Dallas, quando possibile.
-- Normalizzazione ID per uso in emulazione.
-- Correzione automatica checksum.
-- Supporto a layout di memoria di chiavi compatibili.
-
-Esempio pratico:
-
-Convertire una chiave Cyfral in DS1990A per emularla:
-
-1. Leggi la chiave Cyfral con il Flipper.
-2. Apri iButton Converter.
-3. Seleziona "Cyfral → Dallas ID".
-4. Salva il risultato come nuova chiave emulabile.
-
-Quando usarlo:
-
-- Per sistemi che richiedono formato Dallas anche se la chiave è Cyfral/Metakom.
-- Per creare una copia convertita a scopo di test.
-
-Dove usarlo:
-
-- Citofoni ex-URSS / Est Europa.
-- Installazioni condominiali con protocolli misti.
-
-## • iButton Fuzzer (DS1990 / Metakom / Cyfral)
-
-Strumento avanzato per testare lettori iButton generando ID casuali, sequenziali o mirati, specifici per ogni tecnologia.
-
-Funzionalità ampliate:
-
-- Fuzzing dedicato per:
-  - DS1990 - generazione ID 1-Wire random/validi.
-  - Metakom - generazione ID compatibili con protocollo proprietario.
-  - Cyfral - generazione codice in formato impulso/ciclo.
-- Test di robustezza dei sistemi di accesso.
-- Possibilità di scoprire pattern di accettazione (legalmente, su impianti propri!).
-- Modalità sequenziale, random o custom.
-
-Esempio pratico:
-
-Test di un lettore Metakom per verificarne la sicurezza:
-
-1. Entra in iButton Fuzzer → Metakom.
-2. Seleziona modalità -Random ID-.
-3. Appoggia il Flipper al lettore.
-4. Osserva quali codici vengono accettati (solo su impianti di tua proprietà!).
-
-Quando usarlo:
-
-- Audit di sicurezza.
-- Analisi comportamento lettori.
-- Test compatibilità.
-
-Dove usarlo:
-
-- Sistemi condominiali e commerciali.
-- Installazioni industriali basate su 1-Wire custom.
+> **Nota personale:** iButton DS1990A è ancora onnipresente nei condomini italiani, specialmente a Roma, Milano, Torino e Bologna. La clonazione su RW1990 richiede 3 secondi e costa 0.50 EUR a chiave. Nessuna crittografia, nessuna protezione.
