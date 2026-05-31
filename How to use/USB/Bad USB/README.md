@@ -1,133 +1,48 @@
-# BadUSB
+# BadUSB - Overview
 
-Sistema di automazione basato su script HID che permette al FlipperZero di comportarsi come una tastiera o mouse USB, eseguendo comandi su diversi sistemi operativi.
+Modulo di emulazione **USB HID** (Human Interface Device) per attacchi di keystroke injection. Il Flipper Zero si presenta come una tastiera USB e digita comandi automaticamente. Supporta DuckyScript per lo sviluppo di payload cross-platform.
 
----
-
-## Funzionalità:
-
-* Emulazione completa tastiera HID.
-* Supporto a payload complessi con ritardi, combinazioni e script multi-step.
-* Compatibile con sistemi Windows, macOS, Linux, ChromeOS, Android, iOS (limitato).
-* Inclusi payload dimostrativi e PoC didattici.
+**Emulazione:** USB HID (tastiera) | **Linguaggio:** DuckyScript | **VID/PID:** configurabile | **Target OS:** Windows, macOS, Linux, ChromeOS, Android
 
 ---
 
-## Contenuto:
+## Contenuti
 
-* **Demos:** android, chromeos, gnome, ios, macos, windows
-* **CVE-2024-1086 Linux / wget** – dimostrazioni educative dell’exploit.
-* **Install QFlipper** – installatore automatico (gnome/macos/windows).
-* **Kiosk Evasion Bruteforce** – tentativi di uscita da modalità kiosk.
-* **Rickroll** – apertura browser e avvio meme.
-* **RogueMaster Code & Support** – link e tool correlati.
-* **Test Mouse** – movimenti HID di test.
-* **WiFi Stealer ORG** – demo educativa per recupero profili salvati.
+| # | File | Descrizione |
+|---|------|-------------|
+| 01 | [Fondamenti Tecnici](01-Fondamenti-Tecnici.md) | USB HID protocol, descriptors, keystroke injection, USB enumeration |
+| 02 | [Hardware e Limiti](02-Hardware-e-Limiti.md) | Flipper come USB HID, VID/PID spoofing, typing speed, limiti reali |
+| 03 | [DuckyScript e Payload](03-Protocolli.md) | DuckyScript syntax, comandi, ALT codes, ALTSTRING, payload per Windows/macOS/Linux |
+| 04 | [Guida Operativa](04-Guida-Operativa.md) | Step-by-step BadUSB, esecuzione payload, configurazione + [Script e Payload](Script/README.md) |
+| 05 | [Scenari Reali](05-Scenari-Reali.md) | Scenari pentest: corporate laptop compromise, kiosk exploitation, EDR bypass, physical+BadUSB combo |
+| 06 | [Attacchi e Difese](06-Attacchi-e-Difese.md) | Tecniche di evasione (LOLBins, AMSI bypass, VID/PID spoofing) + contromisure (USB policies, MDM) |
+| 07 | [Aspetti Legali](07-Aspetti-Legali.md) | Normativa italiana/EU per USB HID testing |
+| 08 | [Esperienza Personale](08-Esperienza-Personale.md) | Troubleshooting, note dal campo, errori da evitare |
 
 ---
 
-### • Demos
+## Quick Reference - DuckyScript Comandi Base
 
-Dimostrazioni per diversi sistemi operativi: Android, ChromeOS, GNOME, iOS, macOS, Windows.
+| Comando | Funzione | Esempio |
+|---------|----------|---------|
+| `DELAY` | Pausa (ms) | `DELAY 1000` |
+| `STRING` | Digita testo | `STRING cmd.exe` |
+| `ENTER` | Premi Invio | `ENTER` |
+| `GUI` | Tasto Windows/Cmd | `GUI r` (Esegui) |
+| `ALT` | Tasto Alt | `ALT F4` |
+| `CTRL` | Tasto Ctrl | `CTRL c` |
+| `TAB` | Tasto Tab | `TAB` |
+| `ALTSTRING` | Digita via ALT codes | `ALTSTRING ciao` |
 
-Funzionalità ampliate:
+## Quick Reference - Payload Principali
 
-- Script pronti per mostrare capacità HID.
-- Apertura automatica terminali, browser e tool di sistema.
-- Ideali per apprendere la logica dei payload.
+| Payload | OS | Scopo | Tempo |
+|---------|-----|-------|-------|
+| Reverse shell PS | Windows | Shell remota | ~5s |
+| WiFi password exfil | Windows | Esfiltrazione credenziali WiFi | ~8s |
+| Disable Defender | Windows | Disattivazione AV | ~3s |
+| Hidden admin user | Windows | Persistenza | ~4s |
+| Certutil download | Windows | Download file | ~5s |
+| Terminal + curl | macOS/Linux | Reverse shell/download | ~4s |
 
-Esempio pratico:
-
-Eseguire demo_windows → apre PowerShell e mostra informazioni di sistema.
-
-### • CVE‑2024‑1086 Linux / wget
-
-Dimostrazioni educative dell’exploit CVE‑2024‑1086 su Linux.
-
-Funzionalità ampliate:
-
-- Versione standard e versione wget per download payload.
-- Test di sicurezza e valutazioni didattiche.
-
-Esempio pratico:
-
-Eseguire script su distro vulnerabile → verifica risposta del kernel.
-
-### • Install QFlipper
-
-Installatori automatici per GNOME, macOS e Windows tramite script HID.
-
-Funzionalità ampliate:
-
-- Download automatico del pacchetto.
-- Apertura finestre e conferme installazione.
-- Nessun intervento manuale richiesto.
-
-Esempio pratico:
-
-Eseguire install_qflipper_windows → scarica e installa QFlipper in autonomia.
-
-### • Kiosk Evasion Bruteforce
-
-Script che tenta automaticamente combinazioni per uscire dalla modalità kiosk.
-
-Funzionalità ampliate:
-
-- Sequenze multi‑OS.
-- Test di robustezza sistemi kiosk.
-
-Esempio pratico:
-
-Connettere Flipper su un kiosk → avvio script → verifica se alcune combinazioni riescono a sbloccare input.
-
-### • Rickroll
-
-Script comico che apre il browser e riproduce "Never Gonna Give You Up".
-
-Funzionalità ampliate:
-
-- Compatibile con più browser.
-- Sequenza affidabile anche con ritardi.
-
-Esempio pratico:
-
-Lanciarlo su Windows → apre Chrome → avvia il video.
-
-### • RogueMaster Code & Support
-
-Materiale informativo e link utili relativi al firmware RogueMaster.
-
-Funzionalità ampliate:
-
-- Collegamenti a repository.
-- Note aggiornamenti e strumenti.
-
-Esempio pratico:
-
-Aprire file di supporto → seguire istruzioni per aggiornare firmware.
-
-### • Test Mouse
-
-Script HID che muove il mouse automaticamente.
-
-Funzionalità ampliate:
-
-- Movimenti lineari, circolari o casuali.
-- Test per verificare input HID su PC.
-
-Esempio pratico:
-
-Avviare lo script → il puntatore si muove → utile per debugging.
-
-### • WiFi Stealer ORG
-
-Demo educativa che esegue comandi per recuperare le password Wi‑Fi salvate.
-
-Funzionalità ampliate:
-
-- Esecuzione comandi di estrazione su OS supportati.
-- Salvataggio output.
-
-Esempio pratico:
-
-Eseguirlo su Windows → apre Terminale → mostra profili Wi‑Fi memorizzati.
+> **Nota personale:** Il BadUSB è lo strumento più impattante in un physical pentest. 5 secondi di accesso fisico a un laptop non presidiato = shell remota. La chiave è la preparazione: payload testato, timing calibrato, pretesto credibile. L'errore più comune è non considerare il layout tastiera del target.
