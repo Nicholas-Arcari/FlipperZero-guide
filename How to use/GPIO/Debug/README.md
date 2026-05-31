@@ -1,139 +1,44 @@
-# DEBUG
+# Debug - Overview
 
-Strumenti avanzati di diagnostica, test e programmazione.
+Strumenti avanzati di **hardware hacking** del Flipper Zero: debug SWD/JTAG, programmazione AVR, comunicazione I2C/SPI, dump firmware e reverse engineering di dispositivi embedded.
 
-### **• AVR Flasher**
+**Interfacce:** SWD, JTAG, I2C, SPI, UART | **Target:** MCU (ARM, AVR), EEPROM, Flash, dispositivi embedded
 
-Tool per la programmazione di microcontrollori AVR (Atmel/Microchip) tramite interfacce compatibili con il pinout GPIO del dispositivo.
+---
 
-Funzionalità ampliate:
+## Contenuti
 
-- Supporto ai protocolli più comuni (ISP, HVPP se abilitato da adattatori esterni).
-- Lettura/Scrittura della Flash.
-- Manipolazione dei fuse bits e lock bits.
-- Backup completo del microcontrollore prima della riprogrammazione.
-- Verifica integrità post-flash.
-- Compatibilità con MCU popolari come ATmega328P, ATtiny85, ATmega32U4 e molte altre.
+| # | File | Descrizione |
+|---|------|-------------|
+| 01 | [Fondamenti e Hardware](01-Fondamenti-e-Hardware.md) | SWD/JTAG protocols, debug interfaces, wiring, target identification |
+| 02 | [Tool Debug](02-Tool-Debug.md) | SWD Probe (firmware extraction, register read, breakpoints), DAP Link (GDB integration), AVR Flasher (fuse, flash, EEPROM) |
+| 03 | [Tool Bus](03-Tool-Bus.md) | I2C Tools (scanner, sniffer, sender), SPI Mem Manager (read/write/verify flash), Ethernet Troubleshooter |
+| 04 | [Scenari Reali](04-Scenari-Reali.md) | Scenari hardware hacking: firmware extraction IoT, I2C EEPROM cloning, SPI flash dump, SWD exploitation, UART console |
+| 06 | [Esperienza Personale](06-Esperienza-Personale.md) | Note dal campo, errori hardware hacking, appendice riferimenti rapidi |
 
-Esempio pratico
+---
 
-Programmazione di un ATtiny85 per un progetto LED PWM:
+## Quick Reference - Tool e Interfacce
 
-- Collegare i pin GPIO → ISP (MOSI/MISO/SCK/RESET).
-- Caricare il file firmware.hex.
-- Impostare fuse bits per usare il clock interno a 8 MHz.
-- Flash → Verifica → Test del LED pilotato.
+| Tool | Interfaccia | Funzione | Target Tipico |
+|------|------------|----------|---------------|
+| SWD Probe | SWD (2 pin) | Debug, firmware extraction | ARM Cortex-M |
+| DAP Link | SWD/JTAG | GDB debugging | ARM generico |
+| AVR Flasher | ISP (6 pin) | Flash/fuse/EEPROM | ATmega, ATtiny |
+| I2C Scanner | I2C (2 pin) | Device enumeration | Sensori, EEPROM |
+| I2C Sniffer | I2C (2 pin) | Bus monitoring | Qualsiasi I2C |
+| SPI Mem Manager | SPI (4 pin) | Flash read/write | 25-series flash |
 
-(Note: Alcuni chip AVR richiedono alimentazione 5 V)
+## Quick Reference - Pinout Debug
 
-### **• DAP Link**
+```
+Flipper GPIO    SWD Target       I2C Target       SPI Target
+PA14 (SWCLK) → SWCLK           PA7 (MOSI)     → MOSI
+PA13 (SWDIO) → SWDIO           PA6 (MISO)     → MISO
+GND           → GND             PB3 (SCK)      → SCK
+3.3V          → VCC (opz.)     PA4 (CS)       → CS
+                                PC0 (SDA)      → SDA
+                                PC1 (SCL)      → SCL
+```
 
-Interfaccia multiprotocollo SWD/JTAG per debugger ARM. Ideale per lavorare con microcontrollori Cortex-M.
-
-Funzionalità ampliate:
-
-- Supporto alle estensioni CMSIS-DAP.
-- Debug live: breakpoints, step-through, memory watch.
-- Flashing firmware diretto via SWD/JTAG.
-- Monitoraggio registri core ARM.
-- Compatibilità con IDE e toolchain note:
-    - Keil
-    - PlatformIO
-    - OpenOCD
-    - pyOCD
-
-Esempio pratico
-
-Debug di un firmware STM32 che gestisce un sensore I2C:
-
-- Connettere SWDIO, SWCLK, GND.
-- Avviare debug → eseguire step-through del codice.
-- Monitorare i registri I2C nel debugger.
-- Risolvere un problema di ACK mancante sul sensore.
-
-(Note: Assicurarsi che il target sia alimentato dalla propria sorgente)
-
-### **• Ethernet Troubleshooter**
-
-Strumento per diagnosticare problemi di rete tramite adattatori Ethernet supportati.
-
-Funzionalità ampliate:
-
-- Rilevamento link (10/100/1000 Mbps).
-- Analisi dei pacchetti ARP, DHCP, ICMP (in base a supporto hardware).
-- Verifica connettività LAN e gateway.
-- Test velocità negoziata e duplex.
-- Lettura parametri PHY: link state, errori, collisioni.
-- Modalità “Quick Ping” per test rapidi di raggiungibilità.
-
-Esempio pratico
-
-Verifica del cablaggio di una rete domestica:
-
-- Connettere adattatore USB-Ethernet.
-- Controllare stato link → verifica negoziazione 1000 Mbps.
-- Effettuare Ping verso router.
-- Confermare cablaggio corretto e assenza di disconnessioni.
-
-### **• I2C Tools**
-
-Suite completa per l'analisi del bus I2C, pensata per debugging rapido di sensori e moduli.
-
-Funzionalità ampliate:
-
-- Scansione indirizzi I2C e rilevamento dispositivi attivi.
-- Lettura e scrittura registri a 8 o 16 bit.
-- Dump completo di memoria su dispositivi che lo supportano (EEPROM, sensori).
-- Modalità “Continuous Polling” per visualizzare variazioni di stato in real-time.
-- Supporto a clock standard: 100 kHz, 400 kHz, eventuale Fast Mode+ se hardware compatibile.
-
-Esempio pratico
-
-Debug di un sensore BME280 che risponde con valori errati:
-
-- Avviare I2C scan → verificare indirizzo 0x76.
-- Leggere registri interni → confrontare con datasheet.
-- Trovata configurazione errata del bit di oversampling.
-- Correggere il registro e verificare i valori corretti.
-
-### **• SPI Mem Manager**
-
-Gestione avanzata di memorie SPI NOR/NAND, EEPROM SPI e flash esterne.
-
-Funzionalità ampliate:
-
-- Lettura completa della memoria (dump su file).
-- Scrittura settoriale o completa.
-- Cancellazione pagine, settori, o chip erase totale.
-- Identificazione automatica tramite JEDEC ID.
-- Supporto a memorie tipiche: W25Qxx, AT25xxx, MXIC, GD25Qxx...
-- Verifica CRC e confronto binari dopo la scrittura.
-
-Esempio pratico
-
-Backup e modifica firmware di una memoria W25Q16:
-
-- Collegare CS/MOSI/MISO/SCK.
-- Estrarre il dump → salvare backup.
-- Modificare alcune stringhe del firmware.
-- Flashare nuovo contenuto → verifica CRC.
-
-### **• SWD Probe**
-
-Sonda ARM SWD leggera per debug e flash di microcontrollori Cortex-M.
-
-Funzionalità ampliate:
-
-- Programmazione firmware tramite SWD.
-- Halt/Resume, breakpoints, accesso ai registri core.
-- Lettura/scrittura memoria interna (flash e RAM).
-- Supporto a dispositivi STM32, nRF52, GD32, RP2040 e altri ARM Cortex-M.
-- Funzione “Auto-Detect Target” con riconoscimento IDCODE.
-
-Esempio pratico
-
-- Flash di un firmware su RP2040 (Raspberry Pi Pico):
-- Collegare SWCLK/SWDIO.
-- Caricare firmware.uf2 o binario.
-- Programmare → riavviare → testare.
-- Verificare IDCODE per confermare target corretto.
+> **Nota personale:** Il Flipper come tool di hardware hacking è sottovalutato. Non sostituisce un J-Link o un Bus Pirate, ma per operazioni rapide sul campo (dump EEPROM I2C, read SPI flash, check SWD) è imbattibile per portabilità. Ho estratto firmware da 3 IoT device diversi usando solo il Flipper durante un engagement.
