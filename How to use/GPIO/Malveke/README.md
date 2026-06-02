@@ -1,122 +1,108 @@
-# MALVEKE
+# MALVEKE - Guida Operativa
 
-Il modulo Malveke è un potente addon multi‑funzione che estende il Flipper Zero con fotocamera, storage aggiuntivo, gestione pin avanzata e capacità di test/debug.
+Il modulo Malveke è un addon multi-funzione che estende il Flipper Zero con fotocamera, storage aggiuntivo, stampante termica, gestione pin avanzata e capacità di test/debug. Progettato per maker, analisti hardware e pentester che necessitano di documentazione visiva e strumenti di prototipazione sul campo.
 
-Perfetto sia per maker che per attività di analisi, documentazione e automazione hardware.
+---
 
-### **• Cartridge**
+## Hardware
 
-Sistema di gestione per cartucce interne e firmware modulari del Malveke.
+Il Malveke si collega al Flipper tramite l'header GPIO e aggiunge:
+- **Modulo fotocamera** (OV2640 o compatibile) per foto e streaming video
+- **Slot microSD aggiuntivo** per storage esteso
+- **Interfaccia stampante termica** ESC/POS per stampa sul campo
+- **Pin test integrati** per diagnostica GPIO
 
-Funzionalità ampliate:
+---
 
-- Caricamento e gestione di cartucce software (firmware, funzioni aggiuntive).
-- Backup e ripristino interno delle cartucce.
-- Estrazione e verifica dell’integrità del contenuto.
-- Compatibilità con estensioni create dalla community.
-- Supporto a firme digitali per prevenire corruzioni del contenuto.
+## Tool per Tool
 
-Esempi pratici:
+### Cartridge
 
-- Installare una nuova cartuccia con funzioni di imaging avanzato.
-- Ripristinare una cartuccia corrotta tramite backup locale.
-- Testare versioni sperimentali di funzioni aggiuntive.
+Sistema di gestione firmware modulari per il Malveke.
 
-### **• Emulator**
+**Funzionalità:**
+- Caricamento e gestione di "cartucce" software (funzioni aggiuntive, firmware specializzati)
+- Backup e ripristino del contenuto delle cartucce
+- Verifica integrità con firma digitale
+- Compatibilità con estensioni della community
 
-Modulo dedicato all’emulazione di firmware o funzionalità speciali.
+**Procedura:**
+1. Scarica la cartuccia desiderata (file .bin dalla community)
+2. Copia sulla SD card del Flipper in `/ext/apps_data/malveke/`
+3. Apri Cartridge → seleziona la cartuccia
+4. Installa e verifica integrità
 
-Funzionalità ampliate:
+### Emulator
 
-- Emulazione di moduli hardware esterni (compatibili con protocolli supportati).
-- Modalità sandbox per testare script senza rischiare di danneggiare hardware reale.
-- Debug dei firmware emulati tramite log stato interno.
-- Possibilità di simulare sensori o input digitali/analogici.
+Modulo di emulazione per firmware e funzionalità hardware.
 
-Esempi pratici:
+**Funzionalità:**
+- Emulazione di moduli hardware esterni (sensori I2C, GPIO)
+- Modalità sandbox per test sicuri senza hardware fisico
+- Debug tramite log di stato interno
+- Simulazione segnali digitali/analogici
 
-- Emulare un sensore I2C per testare un'applicazione prima di collegare hardware fisico.
-- Simulare segnali GPIO per test di automazione.
+**Uso nel pentest:** testare script e automazioni prima di eseguirle su hardware reale. Permette di validare che il firmware interagirà correttamente con il target.
 
-### **• Link-Camera**
+### Link-Camera / Live Camera
 
-Streaming video tramite modulo fotocamera del Malveke, ideale per monitoraggio e debugging visivo.
+Streaming video dal modulo fotocamera del Malveke.
 
-Funzionalità ampliate:
+**Link-Camera:**
+- Streaming MJPEG continuo
+- Regolazione risoluzione (QVGA, VGA, SVGA)
+- Controllo esposizione, bilanciamento bianco, luminosità
+- Modalità "Low Latency" per uso real-time
 
-- Streaming MJPEG o H.264 (in base al firmware).
-- Regolazione risoluzione e framerate.
-- Controllo remoto parametri: esposizione, bilanciamento bianco, luminosità.
-- Modalità "Low Latency" per visione quasi in tempo reale.
-- Possibilità di integrare feed in dashboard personalizzate.
+**Live Camera:**
+- Anteprima live senza buffer per risposta immediata
+- Modalità macro per ispezioni ravvicinate
+- Cattura rapida fotogrammi su SD
 
-Esempi pratici:
+**Uso nel pentest/hardware hacking:**
+- Documentazione visiva durante analisi PCB
+- Ispezione saldature e componenti miniaturizzati
+- Mini-endoscopio digitale per ispezionare slot, connettori
+- Registrazione video delle procedure per il report
 
-- Monitorare un banco di test hardware.
-- Utilizzare la Link‑Camera come mini‑endoscopio digitale.
+> **Nota personale:** La camera del Malveke è utilissima durante l'analisi hardware. Quando devo documentare i pad UART/SWD su un PCB per il report, scatto foto direttamente dal Flipper senza dover tirare fuori il telefono. Più discreto e con le foto già sulla SD card del Flipper.
 
-### **• Live Camera**
+### Photo
 
-Visualizzazione video in tempo reale, ottimizzata per risposta rapida e utilizzo manuale.
+Fotografia statica con il modulo camera.
 
-Funzionalità ampliate:
+**Funzionalità:**
+- Scatti JPEG compressi
+- Regolazione ISO, esposizione, focus
+- Gestione album con preview
+- Esportazione via USB/UART/SD
 
-- Anteprima live senza buffer.
-- Modalità macro e regolazioni automatiche.-
-- Supporto alla cattura rapida fotogrammi.
-- Ottima per ispezioni ravvicinate, lettura seriali, PCB.
+### Pin Test
 
-Esempi pratici:
+Strumento di diagnostica per i pin GPIO del Malveke e accessori collegati.
 
-- Analizzare una saldatura su PCB.
-- Controllare componenti miniaturizzati.
+**Funzionalità:**
+- Scanner pin digitali e analogici
+- Rilevazione tensioni e stati logici (HIGH/LOW)
+- Test continuity tra pin
+- Script di test automatici per verifica cablaggi
 
-### **• Photo**
+**Uso:** debug rapido prima di collegare moduli esterni. Verifica che tutti i pin funzionino correttamente dopo un assemblaggio.
 
-Scatta, salva e gestisce fotografie direttamente dal modulo Malveke.
+### Printer
 
-Funzionalità ampliate:
+Interfaccia per stampanti termiche ESC/POS.
 
-- Scatti JPEG compressi o RAW (se il firmware lo supporta).
-- Regolazione ISO, esposizione, focus fisso o macro.
-- Gestione album interni con preview.
-- Esportazione via USB/UART/SD.
+**Funzionalità:**
+- Stampa testo con font variabili
+- QR code, barcode, immagini monocromatiche
+- Configurazione densità e velocità
+- Stampa log diagnostici da altri moduli
 
-Esempi pratici:
+**Uso nel pentest:**
+- Stampa rapida di note durante un engagement (senza usare il telefono)
+- Etichette per componenti durante analisi hardware
+- Stampa QR code per condividere URL/dati rapidamente
+- Log cartaceo delle operazioni per documentazione
 
-- Documentare un'analisi hardware.
-- Salvare immagini di un circuito o un sensore difettoso.
-
-### **• Pin Test**
-
-Strumento avanzato per il test dei pin GPIO del Malveke e accessori collegati.
-
-Funzionalità ampliate:
-
-- Scanner pin digitali e analogici.
-- Rilevazione tensioni, stati logici, resistenze.
-- Test continuity tra pin.
-- Script di test automatici.
-- Ottimo per verificare cablaggi e moduli esterni.
-
-Esempi pratici:
-
-- Controllare se un modulo sensore è collegato correttamente.
-- Verificare cavi o breadboard prima di un progetto.
-
-### **• Printer**
-
-Interfaccia nativa per stampanti termiche, ideale per log, ricevute, etichette o debug portatile.
-
-Funzionalità ampliate:
-
-- Supporto stampanti termiche ESC/POS.
-- Stampa testo, QR, immagini monocromatiche.
-- Configurazione densità, velocità di stampa e formato.
-- Stampa log diagnostici da altri moduli Malveke.
-- Modalità "Field Printer" per etichette rapide.
-
-Esempi pratici:
-
-- Stampare un QR contenente dati di un sensore.
-- Generare etichette per componenti elettronici.
+> **Nota personale:** La stampante termica collegata al Flipper è un gadget ma ha uso pratico: durante un hardware pentest su un impianto industriale, ho stampato le etichette con gli indirizzi I2C di ogni dispositivo trovato sul bus. Le ho attaccate direttamente sulle schede per tenere traccia. Più veloce che prendere appunti.
