@@ -1,0 +1,4 @@
+Filetype: Flipper iButton key
+Version: 1
+Protocol: DS1990
+Rom Data: 01 AA BB CC DD EE FF 00
