@@ -1,0 +1,44 @@
+REM =============================================
+REM Esempio BadUSB - Flipper Zero
+REM Script didattico: apre Notepad e scrive testo
+REM Target: Windows 10/11
+REM Layout: IT (italiano)
+REM =============================================
+
+REM Attendi che il sistema riconosca la tastiera USB
+DELAY 2000
+
+REM Apri Esegui (Win+R)
+GUI r
+DELAY 500
+
+REM Apri Notepad
+STRING notepad.exe
+ENTER
+DELAY 1000
+
+REM Scrivi testo dimostrativo
+STRING === Flipper Zero BadUSB Test ===
+ENTER
+ENTER
+STRING Questo è un test di BadUSB.
+ENTER
+STRING Se vedi questo testo, il payload ha funzionato.
+ENTER
+ENTER
+STRING Data e ora di esecuzione:
+ENTER
+
+REM Inserisci data/ora via PowerShell inline
+GUI r
+DELAY 500
+STRING powershell -command "Get-Date | Out-File -Append $env:USERPROFILE\Desktop\flipper_test.txt"
+ENTER
+
+REM =============================================
+REM NOTE PER IL PENTESTER:
+REM - Cambia DELAY in base alla velocità del target
+REM - Verifica il layout tastiera (IT vs US vs DE)
+REM - In un engagement reale, sostituisci con payload operativo
+REM - Testa SEMPRE in VM prima di usare in campo
+REM =============================================
