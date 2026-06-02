@@ -1,43 +1,69 @@
-# GAMES
+# GAMES - Mini-Giochi Hardware
 
-Mini-giochi che sfruttano interfacce esterne, sensori o protocolli hardware per creare esperienze interattive basate su periferiche reali.
+Mini-giochi che sfruttano interfacce GPIO esterne, sensori e protocolli hardware per creare esperienze interattive. Oltre all'aspetto ludico, rappresentano eccellenti esempi didattici di comunicazione UART, lettura sensori e gestione input real-time.
 
-Oltre all’aspetto ludico, questi giochi rappresentano ottimi esempi di utilizzo pratico di UART, sensori e input esterni.
+---
 
-### **• UART Pong**
+## UART Pong
 
-Versione hardware di Pong controllata tramite comunicazione UART, che permette di collegare dispositivi esterni come joystick, rotary encoder, tastiere o perfino microcontrollori dedicati.
+Versione hardware del classico Pong controllata tramite comunicazione seriale UART.
 
-Funzionalità ampliate:
+### Come Funziona
 
-- Comunicazione seriale stabile a 9600/115200 baud (a seconda della configurazione).
-- Rilevamento input real-time inviati via UART (comandi UP/DOWN).
-- Possibilità di personalizzare velocità della pallina, dimensione delle paddle e difficoltà.
-- Modalità “AI Mode” dove il Flipper controlla un lato e l’utente l’altro.
-- Supporto per controller artigianali basati su ESP8266/Arduino.
+Il gioco utilizza la UART del Flipper (pin PB6 TX, PB7 RX) per ricevere input da un controller esterno. Il controller (Arduino, ESP8266, joystick seriale) invia comandi UP/DOWN via seriale, e il Flipper muove la paddle di conseguenza.
 
-Esempi pratici:
+**Parametri comunicazione:**
+- Baud rate: 9600 o 115200 (configurabile)
+- Formato: 8N1 (8 data bit, no parity, 1 stop bit)
+- Comandi: caratteri ASCII ('ù = up, 'D' = down) o valori binari
 
-- Collegare un joystick analogico a un microcontrollore → inviare valori via UART al Flipper per controllare la paddle.
-- Test di comunicazione seriale tra Flipper e un progetto personale.
-- Creazione di un controller fisico dedicato stampato in 3D.
+**Configurazione:**
+- Velocità pallina: regolabile
+- Dimensione paddle: regolabile
+- Modalità AI: il Flipper controlla un lato automaticamente
 
-### **• VL6180X Pong**
+### Valore Didattico
 
-Variante di Pong che utilizza il sensore di distanza VL6180X (Time-of-Flight) come input per il movimento della paddle.
+UART Pong è il modo migliore per imparare la comunicazione seriale:
+- Come configurare baud rate e formato
+- Come leggere dati in real-time senza blocking
+- Come sincronizzare input esterno con logica di gioco
+- Come gestire il timing tra frame di gioco e lettura UART
 
-Più ci si avvicina o allontana dal sensore, più la racchetta si sposta.
+**Esempio di controller Arduino:**
+```
+void setup() { Serial.begin(9600); }
+void loop() {
+  int val = analogRead(A0); // Joystick Y
+  if (val > 600) Serial.write('U');
+  else if (val < 400) Serial.write('D');
+  delay(50);
+}
+```
 
-Funzionalità ampliate:
+> **Nota personale:** Ho usato UART Pong come demo durante un workshop di hardware hacking. Collegando un joystick a un Arduino e poi al Flipper via UART, i partecipanti capivano in 5 minuti come funziona la comunicazione seriale. Molto più efficace di spiegare la teoria.
 
-- Lettura distanza tramite I2C con refresh rapido.
-- Mappatura dinamica dei valori misurati → posizione paddle.
-- Calibrazione automatica per ambienti con luce variabile o superfici non uniformi.
-- Modalità “Precision Mode” per sensori configurati a 1 mm di risoluzione.
-- Adattamento della difficoltà in base alla stabilità del segnale TOF.
+---
 
-Esempi pratici:
+## VL6180X Pong
 
-- Montare il VL6180X su una piccola basetta → muovere la mano sopra il sensore per controllare il gioco.
-- Utilizzare il gioco per testare il corretto funzionamento del modulo ToF.
-- Dimostrazione didattica del funzionamento dei sensori di distanza.
+Variante di Pong controllata dal sensore di distanza VL6180X (Time-of-Flight) - più ci si avvicina o allontana dal sensore, più la paddle si sposta.
+
+### Come Funziona
+
+Il VL6180X è un sensore ToF che misura la distanza tramite il tempo di volo di un impulso IR. Connesso via I2C (indirizzo 0x29), fornisce misure in millimetri con refresh rate elevato.
+
+**Mappatura:** la distanza misurata (0-100mm) viene mappata linearmente sulla posizione della paddle sullo schermo.
+
+**Configurazione:**
+- Calibrazione automatica per luce variabile
+- Modalità "Precision Mode": risoluzione 1mm
+- Adattamento difficoltà basato sulla stabilità del segnale
+
+### Valore Didattico
+
+Dimostra l'uso pratico di:
+- Bus I2C con polling ad alta frequenza
+- Mappatura di valori analogici su azioni discrete
+- Calibrazione automatica di sensori
+- Gestione del rumore nei dati del sensore
