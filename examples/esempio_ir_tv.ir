@@ -1,0 +1,47 @@
+Filetype: IR signals file
+Version: 1
+#
+# Esempio telecomando TV - Protocollo NEC
+# Questo file può essere caricato su: /ext/infrared/
+#
+name: Power
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 08 00 00 00
+#
+name: Vol_up
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 02 00 00 00
+#
+name: Vol_dn
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 03 00 00 00
+#
+name: Ch_next
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 1A 00 00 00
+#
+name: Ch_prev
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 1E 00 00 00
+#
+name: Mute
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 09 00 00 00
+#
+name: Source
+type: parsed_signal
+protocol: NEC
+address: 04 00 00 00
+command: 0B 00 00 00
