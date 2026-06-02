@@ -1,73 +1,66 @@
-# FLIPBOARD
+# FLIPBOARD - Guida Operativa
 
-Addon modulare con pulsanti, LED e tracce integrate, pensato come una breadboard intelligente per prototipazione rapida.
+Addon modulare con pulsanti fisici, LED RGB e tracce integrate, progettato come breadboard intelligente per prototipazione rapida e interazione I/O con il Flipper Zero.
 
-Permette di collegare componenti elettronici al Flipper Zero in modo stabile, ordinato e immediato, fornendo sia funzioni I/O di base sia mini-app specializzate.
+---
 
-### **• Flipboard Blinky**
+## Hardware
 
-Applicazione per il controllo dei LED presenti sulla Flipboard, utile per testare alimentazione, pinout e funzioni I/O.
+La Flipboard si collega all'header GPIO del Flipper e fornisce:
+- **4 pulsanti fisici** mappati su pin GPIO
+- **4 LED RGB** controllabili via PWM
+- **Tracce di collegamento** per componenti esterni
+- **Area di prototipazione** per saldature rapide
 
-Funzionalità ampliate:
+---
 
-- Accensione, spegnimento e lampeggio dei LED integrati.
-- Test rapidi dei pin GPIO associati ai LED.
-- Possibilità di generare pattern di lampeggio personalizzati.
-- Controllo dell’intensità (quando supportato) tramite PWM.
+## Tool
 
-Esempi pratici:
+### Flipboard Blinky
 
-- Verifica del corretto collegamento Flipper ↔ Flipboard.
-- Debug rapido per capire se un pin sta funzionando.
-- Creazione di indicatori visivi durante lo sviluppo di altri progetti.
+Controllo diretto dei LED integrati.
 
-### **• Flipboard Keyboard**
+**Funzionalità:**
+- Accensione/spegnimento individuale dei 4 LED
+- Pattern di lampeggio personalizzabili (frequenza, duty cycle)
+- Controllo colore RGB tramite PWM sui tre canali
+- Test rapido del pinout GPIO → LED
 
-Trasforma Flipboard in una piccola tastiera digitale o macro-pad basato su combinazioni di pulsanti.
+**Uso pratico:**
+- Verifica del collegamento Flipper ↔ Flipboard
+- Debug visivo: assegna un LED a un evento (es. LED rosso = errore, verde = successo)
+- Indicatore di stato durante script GPIO automatizzati
 
-Funzionalità ampliate:
+### Flipboard Keyboard
 
-- Mappatura dei tasti della Flipboard in input digitali verso il Flipper.
-- Possibilità di assegnare funzioni personalizzate ai pulsanti.
-- Modalità "macro" per eseguire sequenze predefinite.
-- Supporto per protocolli o input verso moduli esterni (I²C/SPI, quando integrato).
+Trasforma i pulsanti della Flipboard in un macro-pad programmabile.
 
-Esempi pratici:
+**Funzionalità:**
+- Mappatura di ogni pulsante su un'azione (invio UART, comando GPIO, toggle LED)
+- Modalità "macro": sequenze predefinite per ogni tasto
+- Supporto a combinazioni e sequenze multi-step
 
-- Controllo remoto di script.
-- Attivazione rapida di funzioni del Flipper (es. invio di comandi UART).
-- Utilizzo come controller minimale per testare UI o menu.
+**Uso nel pentest:**
+- Macro-pad per azioni frequenti durante un engagement
+- Tasto 1: avvia scan WiFi, Tasto 2: cattura Sub-GHz, Tasto 3: toggle LED stato, Tasto 4: salva log
+- Automazione rapida senza navigare i menu
 
-### **• Flipboard Signal**
+### Flipboard Signal
 
-Modulo dedicato al monitoraggio dei segnali elettrici sui pin della Flipboard, utile per debug o lettura rapida di stati logici.
+Monitoraggio segnali elettrici sui pin della Flipboard.
 
-Funzionalità ampliate:
+**Funzionalità:**
+- Lettura digitale HIGH/LOW in tempo reale
+- Analisi livello logico con visualizzazione su display
+- Rilevazione segnali in ingresso a bassa velocità
+- Indicazione tramite LED del livello logico
 
-- Lettura digitale on/off dei pin collegati.
-- Analisi semplice del livello logico (HIGH/LOW).
-- Visualizzazione in tempo reale tramite indicatori LED o display.
-- Rilevazione di segnali in ingresso a bassa velocità.
+**Uso:** diagnostica di sensori, pulsanti esterni, rele', transistor. Utile per verificare che un circuito funzioni prima di collegarlo al Flipper.
 
-Esempi pratici:
+### Flipboard Simon
 
-- Diagnostica di un sensore o pulsante esterno.
-- Verifica della continuità di un circuito.
-- Lettura dello stato di un relè o transistor.
+Gioco "Simon Says" con LED e pulsanti - sequenze di colori da memorizzare.
 
-### **• Flipboard Simon**
+**Valore didattico:** dimostra l'uso completo di I/O GPIO (input da pulsanti + output su LED + logica di gioco). Ottimo esempio per capire come funzionano interrupt, debounce e timing su GPIO.
 
-Replica del famoso gioco “Simon Says”, sfruttando LED e pulsanti della Flipboard per creare una sequenza da memorizzare.
-
-Funzionalità ampliate:
-
-- Sequenze di colore/luci con difficoltà crescente.
-- Supporto al punteggio e alla cronologia delle partite.
-- Modalità training con sequenze lente o ripetute.
-- Possibilità di utilizzare suoni o vibrazioni (se presenti su moduli esterni).
-
-Esempi pratici:
-
-- Dimostrazione divertente delle capacità I/O della Flipboard.
-- Esercitazione di reattività e memoria.
-- Test funzionale completo di LED e pulsanti in un’unica app.
+> **Nota personale:** La Flipboard è più un tool da maker che da pentester, ma l'ho usata come macro-pad durante engagement lunghi. Avere 4 pulsanti fisici mappati su azioni frequenti velocizza il lavoro quando passi ore a catturare segnali RF o testare badge NFC.
