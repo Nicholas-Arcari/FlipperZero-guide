@@ -1,0 +1,76 @@
+name: Validate Repository
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-latest
+    name: Validate file structure and links
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate Flipper files
+        run: python3 scripts/validate-files.py .
+
+      - name: Check module structure
+        run: |
+          echo "=== Verifica struttura moduli ==="
+          ERRORS=0
+
+          # Moduli che devono avere 8 sotto-file
+          for module in Sub-GHz NFC RFID iButton Infrared Bluetooth WiFi-Marauder; do
+            dir="How to use/$module"
+            if [ ! -f "$dir/README.md" ]; then
+              echo "[FAIL] $dir/README.md mancante"
+              ERRORS=$((ERRORS + 1))
+            fi
+            for n in 01 02 03 04 05 06 07 08; do
+              count=$(find "$dir" -maxdepth 1 -name "${n}-*.md" | wc -l)
+              if [ "$count" -eq 0 ]; then
+                echo "[WARN] $dir/${n}-*.md mancante"
+              fi
+            done
+          done
+
+          # BadUSB sub-files
+          dir="How to use/USB/Bad USB"
+          if [ ! -f "$dir/README.md" ]; then
+            echo "[FAIL] $dir/README.md mancante"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Root files
+          for f in README.md CHEATSHEET.md LAB-SETUP.md CHANGELOG.md GLOSSARY.md; do
+            if [ ! -f "$f" ]; then
+              echo "[FAIL] $f mancante"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "=== $ERRORS errori trovati ==="
+            exit 1
+          fi
+
+          echo "=== Struttura OK ==="
+
+      - name: Check for large binary files
+        run: |
+          echo "=== Verifica file binari grandi ==="
+          LARGE_FILES=$(find . -size +1M -not -path './.git/*' -type f 2>/dev/null || true)
+          if [ -n "$LARGE_FILES" ]; then
+            echo "[WARN] File > 1MB trovati:"
+            echo "$LARGE_FILES"
+          else
+            echo "[OK] Nessun file binario grande"
+          fi
