@@ -1,0 +1,20 @@
+REM ============================================================
+REM Title:    Rickroll (Awareness Demo)
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Demo / Awareness
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~4 secondi
+REM Detect:   Nessuno - apre solo un browser
+REM Desc:     Apre il browser con il video di Rick Astley.
+REM           Payload dimostrativo per awareness training.
+REM           Dimostra che un BadUSB può fare QUALSIASI COSA
+REM           che un utente può fare con la tastiera.
+REM ============================================================
+
+DELAY 1500
+GUI r
+DELAY 500
+STRING https://www.youtube.com/watch?v=dQw4w9WgXcQ
+ENTER
