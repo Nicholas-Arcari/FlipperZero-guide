@@ -1,5 +1,0 @@
-ADD_SCENE(desfire_app, start, Start)
-ADD_SCENE(desfire_app, choose_action, ChooseAction)
-ADD_SCENE(desfire_app, set_vector, SetVector)
-ADD_SCENE(desfire_app, set_key, SetKey)
-ADD_SCENE(desfire_app, emulate, Emulate)
