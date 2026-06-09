@@ -62,7 +62,7 @@ def validate_sub(filepath):
 
     if 'RAW' in content:
         if 'RAW_Data:' not in content:
-            errors.append("File RAW senza campo 'RAW_Datà")
+            errors.append("File RAW senza campo 'RAW_Data'")
     else:
         if 'Protocol:' not in content:
             errors.append("Campo 'Protocol' mancante")
@@ -76,8 +76,8 @@ def validate_nfc(filepath):
     with open(filepath, 'r') as f:
         content = f.read()
 
-    if 'Filetype: Flipper NFC devicè not in content:
-        errors.append("Header 'Filetype: Flipper NFC devicè mancante")
+    if 'Filetype: Flipper NFC device' not in content:
+        errors.append("Header 'Filetype: Flipper NFC device' mancante")
 
     if 'Version:' not in content:
         errors.append("Campo 'Version' mancante")
@@ -86,7 +86,7 @@ def validate_nfc(filepath):
         errors.append("Campo 'UID' mancante")
 
     if 'SAK:' not in content and 'Device type:' not in content:
-        errors.append("Campo 'SAK' o 'Device typè mancante")
+        errors.append("Campo 'SAK' o 'Device type' mancante")
 
     return errors
 
@@ -101,10 +101,10 @@ def validate_rfid(filepath):
         errors.append("Header 'Filetype: Flipper RFID key' mancante")
 
     if 'Key type:' not in content:
-        errors.append("Campo 'Key typè mancante")
+        errors.append("Campo 'Key type' mancante")
 
     if 'Data:' not in content:
-        errors.append("Campo 'Datà mancante")
+        errors.append("Campo 'Data' mancante")
 
     return errors
 
@@ -130,8 +130,8 @@ def validate_ir(filepath):
     with open(filepath, 'r') as f:
         content = f.read()
 
-    if 'Filetype: IR signals filè not in content:
-        errors.append("Header 'Filetype: IR signals filè mancante")
+    if 'Filetype: IR signals file' not in content:
+        errors.append("Header 'Filetype: IR signals file' mancante")
 
     names = re.findall(r'^name:\s*(.+)$', content, re.MULTILINE)
     if not names:
